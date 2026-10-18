@@ -1,0 +1,3221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ecogen — Генерация экологического будущего</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌿</text></svg>">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --green-900:#0F2E1D;
+  --green-800:#1B4332;
+  --green-700:#2D6A4F;
+  --green-500:#40916C;
+  --green-400:#52B788;
+  --green-300:#95D5B2;
+  --green-100:#E9F5EE;
+  --green-50:#F3FAF5;
+  --blue-500:#0288D1;
+  --blue-300:#4FC3F7;
+  --sand-500:#C9A87C;
+  --sand-100:#F5EDDD;
+  --ink:#0F2018;
+  --muted:#5B6B62;
+  --bg:#FAFCFA;
+  --white:#FFFFFF;
+  --shadow-sm:0 1px 2px rgba(15,46,29,.06);
+  --shadow:0 4px 16px rgba(15,46,29,.07),0 2px 4px rgba(15,46,29,.04);
+  --shadow-md:0 8px 24px rgba(15,46,29,.09),0 3px 8px rgba(15,46,29,.05);
+  --shadow-lg:0 16px 48px rgba(15,46,29,.13),0 6px 16px rgba(15,46,29,.06);
+  --shadow-xl:0 24px 64px rgba(15,46,29,.18),0 8px 24px rgba(15,46,29,.08);
+  --shadow-green:0 8px 24px rgba(64,145,108,.28);
+  --shadow-green-lg:0 16px 40px rgba(64,145,108,.38);
+  --radius-sm:10px;
+  --radius:16px;
+  --radius-md:20px;
+  --radius-lg:24px;
+  --radius-xl:32px;
+  --grad-green:linear-gradient(135deg,#40916C 0%,#2D6A4F 100%);
+  --grad-green-dark:linear-gradient(135deg,#2D6A4F 0%,#1B4332 50%,#0F2E1D 100%);
+  --grad-blue:linear-gradient(135deg,#4FC3F7 0%,#0288D1 100%);
+  --grad-hero:linear-gradient(135deg,#F3FAF5 0%,#E9F5EE 50%,#D8F3DC 100%);
+  --grad-glass:linear-gradient(135deg,rgba(255,255,255,.9) 0%,rgba(255,255,255,.7) 100%);
+  --ease:cubic-bezier(0.4,0,0.2,1);
+  --ease-out:cubic-bezier(0.16,1,0.3,1);
+  --ease-spring:cubic-bezier(0.34,1.56,0.64,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:80px}
+body{font-family:'Inter','Manrope',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--ink);background:var(--bg);line-height:1.65;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;letter-spacing:-0.01em}
+h1,h2,h3,h4,h5{font-family:'Manrope','Inter',sans-serif;letter-spacing:-0.025em;font-weight:800}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none}
+input,textarea,select{font-family:inherit;font-size:1rem}
+:focus-visible{outline:3px solid var(--green-500);outline-offset:2px;border-radius:6px}
+.skip-link{position:absolute;left:-9999px;top:0;background:var(--green-700);color:#fff;padding:.75rem 1rem;z-index:9999;border-radius:0 0 8px 0}
+.skip-link:focus{left:0}
+.container{max-width:1200px;margin:0 auto;padding:0 1.25rem}
+.section{padding:5rem 0}
+.section-head{text-align:center;max-width:720px;margin:0 auto 3rem}
+.section-head .eyebrow{display:inline-block;font-size:.8rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--green-700);background:var(--green-100);padding:.35rem .9rem;border-radius:999px;margin-bottom:1rem}
+.section-head h2{font-size:clamp(1.8rem,4vw,2.6rem);line-height:1.2;margin-bottom:.75rem;color:var(--green-900)}
+.section-head p{color:var(--muted);font-size:1.05rem}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.85rem 1.6rem;border-radius:999px;font-weight:600;font-size:1rem;transition:.25s;border:2px solid transparent}
+.btn-primary{background:var(--green-700);color:#fff}
+.btn-primary:hover{background:var(--green-900);transform:translateY(-2px);box-shadow:var(--shadow-lg)}
+.btn-outline{border-color:var(--green-700);color:var(--green-700);background:transparent}
+.btn-outline:hover{background:var(--green-700);color:#fff}
+.card{background:var(--white);border-radius:var(--radius);padding:1.75rem;box-shadow:var(--shadow);border:1px solid rgba(45,106,79,.06);transition:.25s}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+header{position:sticky;top:0;z-index:1000;background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid rgba(45,106,79,.1)}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.9rem 0}
+.logo{display:flex;align-items:center;gap:.6rem;font-weight:800;font-size:1.35rem;color:var(--green-900)}
+.logo-mark{width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,var(--green-500),var(--green-700));color:#fff;font-size:1.15rem;box-shadow:0 4px 12px rgba(45,106,79,.3)}
+.logo span{color:var(--green-500)}
+.nav-links{display:flex;gap:.35rem;align-items:center;list-style:none}
+.nav-links a{padding:.55rem .9rem;border-radius:999px;font-weight:500;font-size:.95rem;transition:.2s;white-space:nowrap}
+.nav-links a:hover{background:var(--green-100);color:var(--green-700)}
+.nav-right{display:flex;align-items:center;gap:.75rem}
+.lang-switch{display:flex;background:var(--green-100);border-radius:999px;padding:3px}
+.lang-switch button{padding:.35rem .7rem;border-radius:999px;font-size:.8rem;font-weight:700;color:var(--green-700);transition:.2s}
+.lang-switch button.active{background:var(--green-700);color:#fff}
+.burger{display:none;flex-direction:column;gap:5px;padding:.5rem}
+.burger span{width:24px;height:2px;background:var(--green-900);border-radius:2px}
+.hero{position:relative;overflow:hidden;background:radial-gradient(ellipse at 85% 15%,rgba(79,195,247,.18),transparent 55%),radial-gradient(ellipse at 10% 90%,rgba(149,213,178,.35),transparent 55%),linear-gradient(180deg,#fff 0%,var(--green-100) 100%);padding:5rem 0 4rem}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:3.5rem;align-items:center}
+.hero h1{font-size:clamp(2.1rem,5vw,3.6rem);line-height:1.1;color:var(--green-900);margin-bottom:1.25rem;letter-spacing:-.02em}
+.hero h1 em{font-style:normal;background:linear-gradient(135deg,var(--green-500),var(--blue-500));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:1.15rem;color:var(--muted);max-width:540px;margin-bottom:2rem}
+.hero-cta{display:flex;gap:.85rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.hero-stats{display:flex;gap:2rem;flex-wrap:wrap}
+.hero-stats .stat strong{display:block;font-size:1.9rem;font-weight:800;color:var(--green-700);line-height:1}
+.hero-stats .stat span{font-size:.85rem;color:var(--muted)}
+.hero-visual{position:relative;aspect-ratio:1/1;border-radius:32px;background:linear-gradient(160deg,var(--green-500),var(--green-900));box-shadow:var(--shadow-lg);overflow:hidden;display:grid;place-items:center}
+.hero-visual::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,rgba(149,213,178,.4),transparent 50%),radial-gradient(circle at 75% 75%,rgba(79,195,247,.35),transparent 50%)}
+.hero-visual .emoji{font-size:9rem;filter:drop-shadow(0 10px 30px rgba(0,0,0,.25));position:relative;z-index:1}
+.float-badge{position:absolute;background:#fff;border-radius:14px;padding:.7rem 1rem;box-shadow:var(--shadow-lg);font-size:.85rem;font-weight:600;display:flex;align-items:center;gap:.5rem;z-index:2}
+.float-badge.b1{top:8%;left:-4%}
+.float-badge.b2{bottom:12%;right:-4%}
+#ecomap{background:#fff}
+.map-layout{display:grid;grid-template-columns:1fr 340px;gap:1.5rem}
+#map{height:560px;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid rgba(45,106,79,.1);z-index:1}
+.map-side{display:flex;flex-direction:column;gap:1rem}
+.layer-toggle{background:var(--white);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow);border:1px solid rgba(45,106,79,.06)}
+.layer-toggle h3{font-size:.95rem;margin-bottom:.9rem;color:var(--green-900)}
+.layer-item{display:flex;align-items:center;gap:.7rem;padding:.55rem .6rem;border-radius:10px;cursor:pointer;transition:.2s;font-size:.9rem}
+.layer-item:hover{background:var(--green-100)}
+.layer-item input{accent-color:var(--green-700);width:17px;height:17px;cursor:pointer}
+.dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+.dot.school{background:var(--green-500)}
+.dot.problem{background:#E63946}
+.dot.recycle{background:var(--blue-500)}
+.dot.nature{background:#2D6A4F}
+.dot.industry{background:#8B4513}
+.dot.station{background:#6A4C93}
+.dot.global{background:linear-gradient(135deg,#50F0E6,#F0E641,#FF5050)}
+.aqi-panel{background:var(--white);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow);border:1px solid rgba(45,106,79,.06)}
+.aqi-panel h3{font-size:.95rem;margin-bottom:.9rem;color:var(--green-900)}
+.aqi-row{display:flex;justify-content:space-between;align-items:center;padding:.5rem 0;border-bottom:1px dashed rgba(45,106,79,.15);font-size:.9rem}
+.aqi-row:last-of-type{border-bottom:none}
+.aqi-val{font-weight:700;padding:.15rem .55rem;border-radius:8px;font-size:.8rem;background:#E9ECEF;color:#495057;min-width:40px;text-align:center}
+.aqi-good{background:#D8F3DC !important;color:#1B4332 !important}
+.aqi-mod{background:#FFF3BF !important;color:#7A5B00 !important}
+.aqi-bad{background:#FFD6D6 !important;color:#A11C1C !important}
+.aqi-very-bad{background:#FFB4B4 !important;color:#7A0E0E !important}
+.aqi-hazardous{background:#8F3F97 !important;color:#FFFFFF !important}
+.legend-note{font-size:.78rem;color:var(--muted);margin-top:.5rem}
+.pin{width:26px;height:26px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.pin.school{background:var(--green-500)}
+.pin.problem{background:#E63946}
+.pin.recycle{background:var(--blue-500)}
+.pin.nature{background:#2D6A4F}
+.pin.industry{background:#8B4513}
+.pin.station{background:#6A4C93}
+.leaflet-popup-content-wrapper{border-radius:12px}
+.leaflet-popup-content{margin:14px 16px;font-size:.9rem}
+.leaflet-popup-content h4{margin-bottom:.35rem;color:var(--green-900);font-size:1rem}
+.leaflet-popup-content p{margin:.25rem 0;color:var(--muted);font-size:.85rem}
+/* =========================================================
+   ТАБЛИЦА ДЕТАЛЬНЫХ ДАННЫХ О ВОЗДУХЕ
+   ========================================================= */
+.aqi-details {
+  margin: 10px 0 12px;
+  border-top: 1px solid #e9ecef;
+  border-bottom: 1px solid #e9ecef;
+  padding: 6px 0;
+}
+.aqi-details-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 4px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  border-radius: 6px;
+  transition: background .2s ease;
+}
+.aqi-details-row:hover {
+  background: var(--green-50);
+}
+.aqi-details-row span:first-child {
+  font-weight: 600;
+  color: var(--ink);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.aqi-details-row small {
+  font-size: 0.7rem;
+  opacity: 0.55;
+  font-weight: 400;
+  font-style: normal;
+}
+.aqi-details-row .aqi-val {
+  min-width: 58px;
+  text-align: center;
+  font-size: 0.78rem;
+  padding: 4px 8px !important;
+  font-weight: 700;
+}
+
+.forecast-svg {
+  display: block;
+  margin: 8px 0 4px;
+}
+.forecast-loading {
+  font-size: 0.85rem;
+  color: #6c757d;
+  font-style: italic;
+}
+.leaflet-popup-content {
+  min-width: 320px;
+}
+
+.leaflet-popup-content .badge{display:inline-block;margin-top:.4rem;font-size:.72rem;font-weight:700;padding:.2rem .55rem;border-radius:6px;background:var(--green-100);color:var(--green-700)}
+#volunteer{background:var(--green-100)}
+.vol-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:2rem;align-items:start}
+.form-card{background:#fff}
+.form-card h3{margin-bottom:.35rem;color:var(--green-900);font-size:1.3rem}
+.form-card .sub{color:var(--muted);font-size:.92rem;margin-bottom:1.5rem}
+.field{margin-bottom:1rem}
+.field label{display:block;font-size:.87rem;font-weight:600;margin-bottom:.4rem;color:var(--green-900)}
+.field input,.field select,.field textarea{width:100%;padding:.75rem .95rem;border:1.5px solid #DDE7E1;border-radius:10px;background:#FBFDFB;transition:.2s;font-size:.95rem}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--green-500);background:#fff;box-shadow:0 0 0 4px rgba(64,145,108,.12)}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.events{display:flex;flex-direction:column;gap:.85rem;margin-bottom:1.25rem}
+.event{display:flex;gap:1rem;align-items:center;background:#fff;padding:1rem;border-radius:14px;box-shadow:var(--shadow);border-left:4px solid var(--green-500);transition:.2s}
+.event:hover{transform:translateX(4px)}
+.event-date{flex-shrink:0;width:56px;height:56px;border-radius:12px;background:var(--green-100);display:grid;place-items:center;text-align:center;line-height:1.1;color:var(--green-900)}
+.event-date b{display:block;font-size:1.3rem}
+.event-date small{font-size:.7rem;text-transform:uppercase}
+.event-info h4{font-size:.98rem;margin-bottom:.15rem}
+.event-info p{font-size:.83rem;color:var(--muted)}
+.story-card{background:linear-gradient(135deg,var(--green-700),var(--green-900));color:#fff;border-radius:var(--radius);padding:1.75rem}
+.story-card .quote{font-size:1.02rem;font-style:italic;line-height:1.55;margin-bottom:1rem}
+.story-card .author{display:flex;align-items:center;gap:.75rem}
+.story-card .avatar{width:46px;height:46px;border-radius:50%;background:var(--green-300);display:grid;place-items:center;font-weight:800;color:var(--green-900);font-size:1.1rem}
+.story-card .author b{display:block;font-size:.95rem}
+.story-card .author span{font-size:.8rem;opacity:.8}
+.gov-card{background:var(--sand-100);border-radius:var(--radius);padding:1.5rem;border:1px solid var(--sand-500)}
+.gov-card h4{color:var(--green-900);margin-bottom:.5rem;display:flex;gap:.5rem;align-items:center}
+.gov-card p{font-size:.9rem;color:var(--muted)}
+.gov-card strong{color:var(--green-700)}
+#calculator{background:#fff}
+.calc-layout{display:grid;grid-template-columns:1fr 1fr;gap:2rem;align-items:start}
+.result-card{background:linear-gradient(160deg,var(--green-700),var(--green-900));color:#fff;border-radius:var(--radius);padding:2rem;box-shadow:var(--shadow-lg);position:sticky;top:100px}
+.result-card h3{font-size:1.1rem;margin-bottom:1.25rem;opacity:.9;font-weight:600}
+.result-total{font-size:3.2rem;font-weight:800;line-height:1;margin-bottom:.25rem}
+.result-total small{font-size:1.1rem;font-weight:600;opacity:.8}
+.result-sub{opacity:.8;font-size:.9rem;margin-bottom:1.5rem}
+.result-bars{display:flex;flex-direction:column;gap:.85rem;margin-bottom:1.5rem}
+.result-bar label{display:flex;justify-content:space-between;font-size:.83rem;margin-bottom:.3rem;opacity:.9}
+.bar-track{height:8px;background:rgba(255,255,255,.2);border-radius:999px;overflow:hidden}
+.bar-fill{height:100%;background:var(--green-300);border-radius:999px;transition:width .6s ease;width:0}
+.result-compare{background:rgba(255,255,255,.12);border-radius:12px;padding:1rem;font-size:.87rem;line-height:1.5}
+.result-compare b{color:var(--green-300)}
+#calendar{background:var(--green-100)}
+.cal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.25rem}
+.cal-card{background:#fff;border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);position:relative;overflow:hidden;transition:.25s}
+.cal-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.cal-card::before{content:"";position:absolute;top:0;left:0;width:100%;height:4px;background:linear-gradient(90deg,var(--green-500),var(--blue-300))}
+.cal-card .date{font-size:.8rem;font-weight:700;color:var(--green-700);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.5rem}
+.cal-card h4{margin-bottom:.5rem;color:var(--green-900);font-size:1.05rem}
+.cal-card p{font-size:.88rem;color:var(--muted);margin-bottom:.85rem}
+.cal-card .idea{font-size:.82rem;background:var(--sand-100);color:var(--green-900);padding:.6rem .8rem;border-radius:10px;border-left:3px solid var(--sand-500)}
+#blog{background:#fff}
+.blog-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.5rem}
+.post{background:#fff;border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);border:1px solid rgba(45,106,79,.07);transition:.25s;display:flex;flex-direction:column}
+.post:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg)}
+.post-img{height:170px;display:grid;place-items:center;font-size:4rem;background:linear-gradient(135deg,var(--green-100),var(--green-300))}
+.post-body{padding:1.35rem;display:flex;flex-direction:column;flex:1}
+.post-tag{align-self:flex-start;font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--green-700);background:var(--green-100);padding:.25rem .6rem;border-radius:6px;margin-bottom:.75rem}
+.post h4{font-size:1.1rem;margin-bottom:.5rem;color:var(--green-900);line-height:1.3}
+.post p{font-size:.88rem;color:var(--muted);margin-bottom:1rem;flex:1}
+.post .read{font-size:.85rem;font-weight:600;color:var(--green-700)}
+#schools{background:linear-gradient(180deg,#fff,var(--green-100))}
+/* РЕЙТИНГ ШКОЛ */
+.schools-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.stat-box {
+  background: linear-gradient(135deg, #fff, var(--green-50));
+  border: 1px solid rgba(45,106,79,.08);
+  border-radius: var(--radius-md);
+  padding: 24px 20px;
+  text-align: center;
+  box-shadow: var(--shadow);
+  transition: all .35s var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+.stat-box::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 3px;
+  background: var(--grad-green);
+  opacity: .8;
+}
+.stat-box:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--green-300);
+}
+.stat-icon {
+  font-size: 2.2rem;
+  margin-bottom: 8px;
+  display: inline-block;
+}
+.stat-number {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 900;
+  font-size: 2rem;
+  letter-spacing: -.04em;
+  background: var(--grad-green);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent;
+  line-height: 1.1;
+  margin-bottom: 4px;
+}
+.stat-label {
+  font-size: .85rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+.schools-filter {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+.filter-btn {
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: #fff;
+  border: 2px solid rgba(45,106,79,.12);
+  color: var(--green-700);
+  font-weight: 600;
+  font-size: .88rem;
+  cursor: pointer;
+  transition: all .25s;
+}
+.filter-btn:hover {
+  border-color: var(--green-500);
+  transform: translateY(-2px);
+}
+.filter-btn.active {
+  background: var(--grad-green);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: var(--shadow-green);
+}
+.schools-rating {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+  border: 1px solid rgba(45,106,79,.06);
+}
+.rating-header {
+  display: grid;
+  grid-template-columns: 50px 2fr 1.4fr 1.2fr 40px;
+  gap: 16px;
+  padding: 14px 24px;
+  background: linear-gradient(135deg, var(--green-50), var(--green-100));
+  border-bottom: 2px solid var(--green-100);
+  font-size: .78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--green-800);
+}
+.rating-row {
+  display: grid;
+  grid-template-columns: 50px 2fr 1.4fr 1.2fr 40px;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 24px;
+  border-bottom: 1px solid rgba(45,106,79,.05);
+  transition: background .25s;
+}
+.rating-row:last-child { border-bottom: none; }
+.rating-row:hover { background: var(--green-50); }
+.rating-row.top-1 { background: linear-gradient(90deg, #FFF9E8 0%, #fff 40%); }
+.rating-row.top-2 { background: linear-gradient(90deg, #F5F5F5 0%, #fff 40%); }
+.rating-row.top-3 { background: linear-gradient(90deg, #FDF2E7 0%, #fff 40%); }
+.rating-rank {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 900;
+  font-size: 1.2rem;
+  color: var(--green-700);
+  text-align: center;
+}
+.rating-school { display: flex; flex-direction: column; gap: 2px; }
+.rating-school-name { font-weight: 700; color: var(--ink); font-size: .95rem; }
+.rating-school-city { font-size: .78rem; color: var(--muted); }
+.rating-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: .75rem;
+  font-weight: 700;
+  justify-self: start;
+  white-space: nowrap;
+}
+.rating-status.flag { background: #D8F3DC; color: #1B4332; }
+.rating-status.gold { background: #FFF3BF; color: #7A5B00; }
+.rating-status.silver { background: #E9ECEF; color: #495057; }
+.rating-status.bronze { background: #F3E0D3; color: #7A3B0E; }
+.rating-progress { display: flex; align-items: center; gap: 10px; }
+.rating-progress-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--green-100);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.rating-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--green-500), var(--green-400));
+  transition: width 1s;
+}
+.rating-progress-num {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 800;
+  font-size: .88rem;
+  color: var(--green-700);
+  min-width: 42px;
+  text-align: right;
+}
+@media(max-width: 760px){
+  .rating-header { display: none; }
+  .rating-row {
+    grid-template-columns: 40px 1fr;
+    gap: 10px;
+    padding: 14px 16px;
+  }
+  .rating-status, .rating-progress { grid-column: 2; }
+}
+
+.schools-wrap{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.5rem}
+.school-card{background:#fff;border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow)}
+.school-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;gap:.75rem}
+.school-head h4{font-size:1rem;color:var(--green-900);line-height:1.3}
+.school-head .city{font-size:.8rem;color:var(--muted);margin-top:.15rem}
+.flag{flex-shrink:0;width:44px;height:44px;border-radius:11px;display:grid;place-items:center;font-size:1.3rem}
+.flag.gold{background:#FFF3BF}
+.flag.silver{background:#E9ECEF}
+.flag.bronze{background:#F3E0D3}
+.progress-label{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);margin-bottom:.4rem}
+.progress-track{height:9px;background:var(--green-100);border-radius:999px;overflow:hidden;margin-bottom:.85rem}
+.progress-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--green-500),var(--green-700));transition:width 1s ease}
+.school-card .steps{font-size:.82rem;color:var(--muted)}
+#about{background:var(--green-900);color:#fff}
+#about .section-head h2{color:#fff}
+#about .section-head p{color:rgba(255,255,255,.75)}
+#about .section-head .eyebrow{background:rgba(255,255,255,.12);color:var(--green-300)}
+.about-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.5rem}
+.about-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:1.75rem;transition:.25s}
+.about-card:hover{background:rgba(255,255,255,.1);transform:translateY(-4px)}
+.about-card .icon{font-size:2rem;margin-bottom:.85rem}
+.about-card h4{margin-bottom:.5rem;color:var(--green-300)}
+.about-card p{font-size:.9rem;color:rgba(255,255,255,.75)}
+footer{background:#0F2A1D;color:rgba(255,255,255,.7);padding:3rem 0 1.5rem;font-size:.9rem}
+.foot-grid{display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr;gap:2rem;margin-bottom:2rem}
+.foot-brand .logo{color:#fff;margin-bottom:.85rem}
+.foot-brand p{font-size:.85rem;line-height:1.6}
+.foot-col h5{color:#fff;margin-bottom:.85rem;font-size:.95rem}
+.foot-col a{display:block;padding:.28rem 0;font-size:.88rem;transition:.2s}
+.foot-col a:hover{color:var(--green-300)}
+.foot-bottom{border-top:1px solid rgba(255,255,255,.1);padding-top:1.25rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.75rem;font-size:.82rem}
+#toTop{position:fixed;bottom:24px;right:24px;z-index:999;width:52px;height:52px;border-radius:50%;background:var(--green-700);color:#fff;font-size:1.5rem;display:none;place-items:center;cursor:pointer;box-shadow:0 8px 24px rgba(45,106,79,.45);transition:all .3s ease;border:none}
+#toTop.show{display:grid}
+#toTop:hover{background:var(--green-900);transform:translateY(-4px)}
+.fade-in{opacity:0;transform:translateY(40px);transition:opacity .8s ease,transform .8s ease}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+.toast{position:fixed;bottom:24px;right:24px;z-index:9999;background:var(--green-700);color:#fff;padding:1rem 1.25rem;border-radius:12px;box-shadow:var(--shadow-lg);font-size:.9rem;transform:translateY(150%);transition:.35s cubic-bezier(.34,1.56,.64,1);max-width:340px}
+.toast.show{transform:translateY(0)}
+@media(max-width:960px){.hero-grid,.map-layout,.vol-grid,.calc-layout{grid-template-columns:1fr}.hero-visual{max-width:400px;margin:0 auto}.result-card{position:static}#map{height:440px}.foot-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:760px){.burger{display:flex}.nav-links{position:absolute;top:100%;left:0;right:0;background:#fff;flex-direction:column;align-items:stretch;padding:1rem;box-shadow:var(--shadow-lg);border-bottom:1px solid var(--green-100);display:none}.nav-links.open{display:flex}.nav-links a{padding:.75rem 1rem}.section{padding:3.5rem 0}.field-row{grid-template-columns:1fr}.foot-grid{grid-template-columns:1fr}.hero-stats{gap:1.25rem}.hero-stats .stat strong{font-size:1.5rem}.float-badge{display:none}}
+/* =========================================================
+   PREMIUM DESIGN v2.0 — ЧАСТЬ 1: Анимации + Кнопки
+   ========================================================= */
+
+/* Кастомный скроллбар */
+::-webkit-scrollbar{width:12px;height:12px}
+::-webkit-scrollbar-track{background:var(--green-50)}
+::-webkit-scrollbar-thumb{background:linear-gradient(180deg,var(--green-500),var(--green-700));border-radius:6px;border:3px solid var(--green-50)}
+::-webkit-scrollbar-thumb:hover{background:linear-gradient(180deg,var(--green-700),var(--green-900))}
+::selection{background:var(--green-300);color:var(--green-900)}
+
+/* Кнопки */
+.btn{
+  position:relative;overflow:hidden;
+  box-shadow:var(--shadow-sm);
+  transition:all .3s var(--ease-spring);
+  font-weight:700;letter-spacing:-0.01em;
+}
+.btn::before{
+  content:"";position:absolute;top:50%;left:50%;
+  width:0;height:0;border-radius:50%;
+  background:rgba(255,255,255,.3);
+  transform:translate(-50%,-50%);
+  transition:width .6s ease,height .6s ease;
+}
+.btn:hover::before{width:400px;height:400px}
+.btn-primary{
+  background:var(--grad-green);
+  box-shadow:var(--shadow-green);
+}
+.btn-primary:hover{
+  transform:translateY(-3px) scale(1.02);
+  box-shadow:var(--shadow-green-lg);
+}
+.btn-outline{
+  background:rgba(255,255,255,.5);
+  backdrop-filter:blur(10px);
+  border:2px solid var(--green-500);
+  color:var(--green-700);
+}
+.btn-outline:hover{
+  background:var(--grad-green);
+  color:#fff;
+  border-color:transparent;
+  transform:translateY(-3px) scale(1.02);
+  box-shadow:var(--shadow-green);
+}
+
+/* Карточки */
+.card{
+  background:var(--grad-glass);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.6);
+  box-shadow:var(--shadow-md);
+  transition:all .4s var(--ease-out);
+  position:relative;overflow:hidden;
+}
+.card::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:3px;
+  background:var(--grad-green);opacity:0;
+  transition:opacity .3s ease;
+}
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:var(--shadow-xl);
+  border-color:var(--green-300);
+}
+.card:hover::before{opacity:1}
+/* =========================================================
+   PREMIUM DESIGN v2.0 — ЧАСТЬ 2: Hero + Header + Карта
+   ========================================================= */
+
+/* Header — Glassmorphism */
+header{
+  background:rgba(255,255,255,.75);
+  backdrop-filter:blur(20px) saturate(180%);
+  border-bottom:1px solid rgba(45,106,79,.08);
+  box-shadow:0 2px 20px rgba(15,46,29,.04);
+}
+.nav-links a{
+  position:relative;
+  font-weight:600;
+  transition:all .25s ease;
+}
+.nav-links a::after{
+  content:"";position:absolute;left:50%;bottom:6px;
+  width:0;height:2px;background:var(--grad-green);
+  transform:translateX(-50%);
+  transition:width .3s var(--ease-out);
+  border-radius:2px;
+}
+.nav-links a:hover{color:var(--green-700);transform:translateY(-1px)}
+.nav-links a:hover::after{width:60%}
+.logo-mark{
+  box-shadow:var(--shadow-green),inset 0 1px 0 rgba(255,255,255,.3);
+  transition:transform .3s var(--ease-spring);
+}
+.logo:hover .logo-mark{transform:rotate(-8deg) scale(1.1)}
+.logo{
+  font-family:'Manrope',sans-serif;
+  font-weight:900;
+  letter-spacing:-0.03em;
+  font-size:1.5rem;
+}
+
+/* Language Switch */
+.lang-switch{
+  background:rgba(233,245,238,.8);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(45,106,79,.1);
+  padding:4px;
+  box-shadow:inset 0 1px 3px rgba(15,46,29,.05);
+}
+.lang-switch button{transition:all .3s var(--ease-spring)}
+.lang-switch button.active{
+  background:var(--grad-green);
+  box-shadow:var(--shadow-green);
+  transform:scale(1.05);
+}
+
+/* HERO секция */
+.hero{
+  background:radial-gradient(ellipse at 85% 15%,rgba(79,195,247,.25),transparent 55%),
+             radial-gradient(ellipse at 10% 90%,rgba(149,213,178,.5),transparent 55%),
+             radial-gradient(ellipse at 50% 50%,rgba(255,255,255,.8),transparent 70%),
+             linear-gradient(180deg,#fff 0%,var(--green-50) 50%,var(--green-100) 100%);
+  position:relative;overflow:hidden;
+}
+.hero::before{
+  content:"";position:absolute;top:-50%;right:-20%;
+  width:800px;height:800px;border-radius:50%;
+  background:radial-gradient(circle,rgba(64,145,108,.08),transparent 70%);
+  animation:floatSlow 20s ease-in-out infinite;
+}
+.hero::after{
+  content:"";position:absolute;bottom:-30%;left:-10%;
+  width:600px;height:600px;border-radius:50%;
+  background:radial-gradient(circle,rgba(79,195,247,.1),transparent 70%);
+  animation:floatSlow 25s ease-in-out infinite reverse;
+}
+@keyframes floatSlow{
+  0%,100%{transform:translate(0,0) scale(1)}
+  50%{transform:translate(50px,-50px) scale(1.1)}
+}
+.hero h1{
+  font-weight:900;
+  line-height:1.05;
+  text-shadow:0 2px 20px rgba(15,46,29,.08);
+}
+.hero h1 em{
+  background:linear-gradient(135deg,#40916C 0%,#0288D1 50%,#52B788 100%);
+  background-size:200% 200%;
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  animation:gradientShift 6s ease infinite;
+  font-style:normal;
+}
+@keyframes gradientShift{
+  0%,100%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+}
+.hero-visual{
+  box-shadow:var(--shadow-xl),inset 0 0 60px rgba(255,255,255,.1);
+  animation:heroFloat 6s ease-in-out infinite;
+}
+@keyframes heroFloat{
+  0%,100%{transform:translateY(0) rotate(0deg)}
+  50%{transform:translateY(-15px) rotate(1deg)}
+}
+.float-badge{
+  backdrop-filter:blur(10px);
+  background:rgba(255,255,255,.9);
+  box-shadow:var(--shadow-lg);
+  animation:badgeFloat 4s ease-in-out infinite;
+}
+.float-badge.b1{animation-delay:0s}
+.float-badge.b2{animation-delay:2s}
+@keyframes badgeFloat{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-10px)}
+}
+.hero-stats .stat strong{
+  font-family:'Manrope',sans-serif;
+  font-weight:900;
+  font-size:2.2rem;
+  background:var(--grad-green);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-0.04em;
+  transition:transform .3s var(--ease-spring);
+  display:inline-block;
+}
+.hero-stats .stat:hover strong{transform:scale(1.08)}
+
+/* Карта */
+#map{
+  box-shadow:var(--shadow-xl);
+  border:2px solid rgba(255,255,255,.5);
+  transition:transform .4s ease;
+}
+#map:hover{transform:scale(1.005)}
+.leaflet-control-zoom{
+  border:none !important;
+  box-shadow:var(--shadow-lg) !important;
+  border-radius:12px !important;
+  overflow:hidden;
+}
+.leaflet-control-zoom a{
+  background:rgba(255,255,255,.95) !important;
+  backdrop-filter:blur(10px);
+  color:var(--green-800) !important;
+  font-size:20px !important;
+  width:38px !important;height:38px !important;
+  line-height:38px !important;
+  transition:all .2s ease;
+}
+.leaflet-control-zoom a:hover{
+  background:var(--green-100) !important;
+  color:var(--green-900) !important;
+  transform:scale(1.1);
+}
+
+/* Маркеры — пульсация */
+.pin.school{
+  animation:pulseGreen 2.5s ease-in-out infinite;
+}
+@keyframes pulseGreen{
+  0%{box-shadow:0 0 0 0 rgba(64,145,108,.7)}
+  50%{box-shadow:0 0 0 12px rgba(64,145,108,0)}
+  100%{box-shadow:0 0 0 0 rgba(64,145,108,0)}
+}
+.pin.problem{
+  animation:pulseRed 2s ease-in-out infinite;
+}
+@keyframes pulseRed{
+  0%{box-shadow:0 0 0 0 rgba(230,57,70,.8)}
+  50%{box-shadow:0 0 0 14px rgba(230,57,70,0)}
+  100%{box-shadow:0 0 0 0 rgba(230,57,70,0)}
+}
+.pin.recycle{
+  animation:pulseBlue 2.5s ease-in-out infinite;
+}
+@keyframes pulseBlue{
+  0%{box-shadow:0 0 0 0 rgba(2,136,209,.7)}
+  50%{box-shadow:0 0 0 12px rgba(2,136,209,0)}
+  100%{box-shadow:0 0 0 0 rgba(2,136,209,0)}
+}
+
+/* Попапы Leaflet */
+.leaflet-popup-content-wrapper{
+  box-shadow:var(--shadow-xl) !important;
+  border-radius:var(--radius-md) !important;
+  padding:4px !important;
+  backdrop-filter:blur(10px);
+}
+.leaflet-popup-content{
+  margin:16px 20px !important;
+  min-width:320px;
+}
+.leaflet-popup-content h4{
+  font-family:'Manrope',sans-serif;
+  font-weight:800;
+  font-size:1.05rem;
+  margin-bottom:6px;
+}
+.leaflet-popup-tip{
+  box-shadow:var(--shadow-md) !important;
+}
+.leaflet-popup-close-button{
+  width:28px !important;height:28px !important;
+  font-size:22px !important;
+  color:var(--green-700) !important;
+  top:6px !important;right:6px !important;
+  transition:all .2s ease;
+}
+.leaflet-popup-close-button:hover{
+  background:var(--green-100) !important;
+  border-radius:50%;
+  transform:rotate(90deg);
+}
+/* =========================================================
+   PREMIUM DESIGN v2.0 — ЧАСТЬ 3: Финальные штрихи
+   ========================================================= */
+
+/* Панели карты — стеклянные */
+.layer-toggle, .aqi-panel{
+  background:var(--grad-glass);
+  backdrop-filter:blur(20px) saturate(180%);
+  border:1px solid rgba(255,255,255,.7);
+  box-shadow:var(--shadow-md);
+}
+.layer-toggle h3, .aqi-panel h3{
+  font-family:'Manrope',sans-serif;
+  font-weight:800;
+  font-size:1rem;
+  color:var(--green-900);
+  padding-bottom:10px;
+  border-bottom:2px solid var(--green-100);
+  margin-bottom:12px;
+  display:flex;align-items:center;gap:8px;
+}
+.layer-item{
+  transition:all .25s var(--ease-spring);
+  border-radius:var(--radius-sm);
+  padding:9px 12px;
+}
+.layer-item:hover{
+  background:var(--green-50);
+  transform:translateX(4px);
+}
+.layer-item input{width:18px;height:18px;transition:transform .2s ease}
+.layer-item input:checked{transform:scale(1.15)}
+.layer-item:hover .dot{transform:scale(1.3)}
+.dot{
+  transition:all .3s var(--ease-spring);
+  box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(0,0,0,.05);
+}
+
+/* AQI панель */
+.aqi-row{
+  transition:all .25s ease;
+  padding:10px 6px;
+  border-radius:8px;
+}
+.aqi-row:hover{background:var(--green-50);transform:translateX(4px)}
+.aqi-val{
+  font-family:'Manrope',sans-serif;
+  font-weight:800;
+  font-size:.9rem;
+  min-width:48px;
+  padding:5px 10px !important;
+  box-shadow:var(--shadow-sm);
+  transition:all .3s var(--ease-spring);
+  display:inline-block;
+}
+.aqi-row:hover .aqi-val{transform:scale(1.1)}
+
+/* Форма волонтёра */
+.field input, .field select, .field textarea{
+  transition:all .3s var(--ease-out);
+  border-width:2px;
+}
+.field input:hover, .field select:hover, .field textarea:hover{
+  border-color:var(--green-300);
+  background:#fff;
+}
+.field input:focus, .field select:focus, .field textarea:focus{
+  border-color:var(--green-500);
+  box-shadow:0 0 0 4px rgba(64,145,108,.15),var(--shadow-sm);
+  transform:translateY(-1px);
+}
+.field label{
+  font-weight:700;
+  color:var(--green-800);
+  font-size:.88rem;
+  letter-spacing:.01em;
+}
+
+/* События */
+.event{
+  transition:all .3s var(--ease-out);
+  position:relative;overflow:hidden;
+}
+.event::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:var(--grad-green);
+  transition:width .3s ease;
+}
+.event:hover{
+  transform:translateX(8px);
+  box-shadow:var(--shadow-md);
+  border-left-color:transparent;
+}
+.event:hover::before{width:6px}
+.event-date{
+  background:var(--grad-green) !important;
+  color:#fff !important;
+  box-shadow:var(--shadow-green);
+  font-family:'Manrope',sans-serif;
+}
+.event-date b{color:#fff !important}
+.event-date small{color:rgba(255,255,255,.85) !important}
+
+/* Story-карточка */
+.story-card{
+  background:var(--grad-green-dark);
+  position:relative;overflow:hidden;
+  box-shadow:var(--shadow-xl);
+}
+.story-card::before{
+  content:"❝";
+  position:absolute;top:-20px;right:20px;
+  font-size:140px;opacity:.08;
+  font-family:Georgia,serif;
+  line-height:1;
+}
+.story-card .avatar{
+  box-shadow:0 0 0 3px rgba(255,255,255,.2),0 8px 24px rgba(0,0,0,.3);
+  background:var(--grad-green) !important;
+  color:#fff !important;
+}
+
+/* Gov-card */
+.gov-card{
+  background:linear-gradient(135deg,#FFF9E8 0%,var(--sand-100) 100%);
+  border:2px solid var(--sand-500);
+  box-shadow:var(--shadow);
+  transition:all .3s ease;
+}
+.gov-card:hover{
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-lg);
+}
+
+/* Калькулятор */
+.result-card{
+  background:var(--grad-green-dark);
+  box-shadow:var(--shadow-xl);
+  position:relative;overflow:hidden;
+}
+.result-card::before{
+  content:"";position:absolute;top:-50%;right:-30%;
+  width:400px;height:400px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.12),transparent 70%);
+}
+.result-total{
+  font-family:'Manrope',sans-serif;
+  font-weight:900;
+  font-size:3.6rem;
+  background:linear-gradient(135deg,#95D5B2 0%,#fff 100%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;
+  letter-spacing:-0.04em;
+}
+.bar-track{
+  height:10px;
+  background:rgba(255,255,255,.15);
+  box-shadow:inset 0 1px 3px rgba(0,0,0,.2);
+}
+.bar-fill{
+  background:linear-gradient(90deg,#95D5B2 0%,#52B788 100%);
+  box-shadow:0 0 12px rgba(149,213,178,.5);
+  border-radius:999px;
+}
+
+/* Календарь */
+.cal-card{
+  transition:all .35s var(--ease-out);
+  position:relative;overflow:hidden;
+}
+.cal-card::before{
+  content:"";position:absolute;top:0;left:0;width:100%;height:4px;
+  background:linear-gradient(90deg,var(--green-500),var(--blue-300),var(--green-500));
+  background-size:200% 100%;
+  animation:gradientSlide 4s linear infinite;
+}
+@keyframes gradientSlide{
+  0%{background-position:0% 50%}
+  100%{background-position:200% 50%}
+}
+.cal-card:hover{
+  transform:translateY(-8px) scale(1.02);
+  box-shadow:var(--shadow-xl);
+}
+.cal-card .date{
+  font-family:'Manrope',sans-serif;
+  font-weight:800;
+  font-size:.85rem;
+  letter-spacing:.1em;
+}
+
+/* Блог */
+.post{
+  transition:all .4s var(--ease-out);
+  position:relative;overflow:hidden;
+}
+.post-img{
+  transition:transform .6s ease;
+  position:relative;overflow:hidden;
+}
+.post:hover .post-img{transform:scale(1.05)}
+.post:hover{
+  transform:translateY(-10px);
+  box-shadow:var(--shadow-xl);
+}
+.post-tag{
+  font-weight:800;
+  letter-spacing:.1em;
+  box-shadow:var(--shadow-sm);
+}
+.post .read{
+  transition:all .25s ease;
+  position:relative;
+}
+.post .read::after{
+  content:"→";
+  margin-left:6px;
+  transition:transform .3s var(--ease-spring);
+  display:inline-block;
+}
+.post:hover .read::after{transform:translateX(6px)}
+
+/* Школы */
+.school-card{
+  transition:all .35s var(--ease-out);
+  position:relative;overflow:hidden;
+}
+.school-card:hover{
+  transform:translateY(-8px);
+  box-shadow:var(--shadow-xl);
+}
+.flag{
+  box-shadow:var(--shadow-md),inset 0 1px 0 rgba(255,255,255,.5);
+  font-size:1.5rem;
+  transition:transform .4s var(--ease-spring);
+}
+.school-card:hover .flag{
+  transform:scale(1.15) rotate(-10deg);
+}
+.progress-track{
+  height:10px;
+  background:linear-gradient(90deg,var(--green-100),var(--green-50));
+  box-shadow:inset 0 1px 3px rgba(15,46,29,.08);
+}
+.progress-fill{
+  background:linear-gradient(90deg,var(--green-500),var(--green-400),var(--green-500));
+  background-size:200% 100%;
+  animation:gradientSlide 3s linear infinite;
+  box-shadow:0 0 8px rgba(64,145,108,.4);
+}
+
+/* About */
+.about-card{
+  background:rgba(255,255,255,.04);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(255,255,255,.08);
+  transition:all .4s var(--ease-out);
+  position:relative;overflow:hidden;
+}
+.about-card:hover{
+  transform:translateY(-8px);
+  background:rgba(255,255,255,.08);
+  border-color:rgba(149,213,178,.3);
+  box-shadow:0 20px 40px rgba(0,0,0,.3);
+}
+.about-card .icon{
+  font-size:2.5rem;
+  display:inline-block;
+  transition:transform .4s var(--ease-spring);
+}
+.about-card:hover .icon{
+  transform:scale(1.2) rotate(-8deg);
+}
+
+/* Футер */
+footer{
+  background:linear-gradient(180deg,#0F2A1D 0%,#081A10 100%);
+  position:relative;overflow:hidden;
+}
+footer::before{
+  content:"";position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,var(--green-500),transparent);
+}
+.foot-col a{
+  transition:all .25s ease;
+  position:relative;
+  display:inline-block;
+}
+.foot-col a:hover{
+  color:var(--green-300);
+  transform:translateX(6px);
+}
+
+/* Toast */
+.toast{
+  backdrop-filter:blur(20px);
+  background:rgba(45,106,79,.95);
+  border:1px solid rgba(255,255,255,.15);
+  box-shadow:var(--shadow-xl);
+}
+
+/* Кнопка наверх */
+#toTop{
+  background:var(--grad-green);
+  box-shadow:var(--shadow-green-lg);
+  transition:all .3s var(--ease-spring);
+}
+#toTop:hover{
+  transform:translateY(-6px) scale(1.1);
+  box-shadow:0 20px 40px rgba(64,145,108,.5);
+}
+
+/* Заголовки секций */
+.section-head h2{
+  position:relative;
+  display:inline-block;
+}
+.section-head h2::after{
+  content:"";position:absolute;bottom:-8px;left:50%;
+  width:60px;height:4px;
+  background:var(--grad-green);
+  border-radius:4px;
+  transform:translateX(-50%);
+  box-shadow:var(--shadow-green);
+}
+.eyebrow{
+  box-shadow:var(--shadow-sm);
+  font-weight:800;
+  letter-spacing:.15em;
+  transition:all .3s var(--ease-spring);
+}
+.eyebrow:hover{
+  transform:scale(1.05);
+  box-shadow:var(--shadow-green);
+}
+/* =========================================================
+   СООБЩИТЬ О ПРОБЛЕМЕ 📸
+   ========================================================= */
+
+.report-btn {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #E63946, #A11C1C);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius, 16px);
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(230,57,70,.35);
+  transition: all 0.3s ease;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}.report-btn:hover {
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 12px 32px rgba(230,57,70,.55);
+}
+.report-btn.picking {
+  background: linear-gradient(135deg, #F0E641, #B8860B);
+  animation: pickPulse 1.5s ease-in-out infinite;
+}
+@keyframes pickPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+
+.report-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15,46,29,.75);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+.report-modal.show { display: flex; }
+.report-modal-content {
+  background: #fff;
+  border-radius: 24px;
+  padding: 28px;
+  max-width: 480px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 24px 64px rgba(0,0,0,.4);
+  position: relative;
+}
+.report-modal-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #E9F5EE;
+  color: #2D6A4F;
+  font-size: 1.4rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  line-height: 1;
+}
+.report-modal-close:hover {
+  background: #E63946;
+  color: #fff;
+}
+.report-modal-content h3 {
+  font-family: 'Manrope', sans-serif;
+  font-weight: 800;
+  font-size: 1.35rem;
+  color: #0F2E1D;
+  margin-bottom: 12px;
+}
+.report-coords {
+  font-size: 0.82rem;
+  color: #5B6B62;
+  margin-bottom: 20px;
+  padding: 8px 12px;
+  background: #E9F5EE;
+  border-radius: 8px;
+  font-family: monospace;
+}
+.report-modal .field { margin-bottom: 16px; }
+.report-photo-preview {
+  margin-top: 10px;
+  display: none;
+  position: relative;
+}
+.report-photo-preview.show { display: block; }
+.report-photo-preview img {
+  width: 100%;
+  max-height: 220px;
+  object-fit: cover;
+  border-radius: 12px;
+}
+.report-photo-preview button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(230,57,70,.9);
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  border: none;
+}
+.report-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+.report-actions .btn {
+  flex: 1;
+  justify-content: center;
+}
+input[type="file"] {
+  padding: 10px;
+  background: #F3FAF5;
+  border: 2px dashed #95D5B2;
+  border-radius: 12px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 0.85rem;
+}
+input[type="file"]:hover {
+  border-color: #40916C;
+  background: #E9F5EE;
+}
+.pin.user-report {
+  background: #E63946;
+  animation: pulseRed 2s ease-in-out infinite;
+}
+@keyframes pulseRed {
+  0% { box-shadow: 0 0 0 0 rgba(230,57,70,.8); }
+  50% { box-shadow: 0 0 0 14px rgba(230,57,70,0); }
+  100% { box-shadow: 0 0 0 0 rgba(230,57,70,0); }
+}
+@media (max-width: 600px) {
+  .report-btn {
+    padding: 12px 16px;
+    font-size: 0.85rem;
+  }
+  .report-modal-content {
+    padding: 22px;
+    border-radius: 20px;
+  }
+}
+/* =========================================================
+   ДЫХАНИЕ ПЛАНЕТЫ 💨
+   ========================================================= */
+.map-with-wind {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius, 16px);
+}
+
+   .wind-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 400;
+  opacity: 0;
+  transition: opacity .6s ease;
+  border-radius: var(--radius, 16px);
+}
+.wind-canvas.active {
+  opacity: 1;
+}
+.wind-toggle {
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #0288D1, #4FC3F7);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius, 16px);
+  font-weight: 700;
+  font-size: 0.92rem;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(2,136,209,.35);
+  transition: all 0.3s ease;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.wind-toggle:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px rgba(2,136,209,.5);
+}
+.wind-toggle.active {
+  background: linear-gradient(135deg, #4FC3F7, #0288D1);
+  animation: windPulse 2.5s ease-in-out infinite;
+}
+@keyframes windPulse {
+  0%, 100% { box-shadow: 0 6px 20px rgba(2,136,209,.35); }
+  50% { box-shadow: 0 10px 32px rgba(79,195,247,.7); }
+}
+
+</style>
+</head>
+<body>
+
+<a href="#main" class="skip-link">Перейти к содержимому</a>
+
+<header>
+  <div class="container">
+    <nav class="nav" aria-label="Главная навигация">
+      <a href="#" class="logo" aria-label="Ecogen — на главную">
+        <span class="logo-mark">🌿</span>
+        Eco<span>gen</span>
+      </a>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="#hero" data-i18n="nav.home">Главная</a></li>
+        <li><a href="#ecomap" data-i18n="nav.map">EcoMap</a></li>
+        <li><a href="#volunteer" data-i18n="nav.volunteer">Волонтёрство</a></li>
+        <li><a href="#calculator" data-i18n="nav.calculator">Калькулятор</a></li>
+        <li><a href="#calendar" data-i18n="nav.calendar">Календарь</a></li>
+        <li><a href="#blog" data-i18n="nav.blog">Блог</a></li>
+        <li><a href="#about" data-i18n="nav.about">О проекте</a></li>
+      </ul>
+      <div class="nav-right">
+        <div class="lang-switch" role="group" aria-label="Выбор языка">
+          <button data-lang="uz">UZ</button>
+          <button data-lang="ru" class="active">RU</button>
+          <button data-lang="en">EN</button>
+        </div>
+        
+        <button class="burger" id="burger" aria-label="Меню" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<section class="hero" id="hero">
+  <div class="container">
+    <div class="hero-grid">
+      <div>
+        <span class="eyebrow" data-i18n="hero.eyebrow">Экологическое образование в Узбекистане</span>
+        <h1 data-i18n-html="hero.title">Генерация <em>экологического</em> будущего</h1>
+        <p data-i18n="hero.subtitle">Ecogen объединяет школьников, учителей и волонтёров по всему Узбекистану.</p>
+        <div class="hero-cta">
+          <a href="#ecomap" class="btn btn-primary" data-i18n="hero.cta1">Открыть EcoMap →</a>
+          <a href="#volunteer" class="btn btn-outline" data-i18n="hero.cta2">Стать волонтёром</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><strong>257+</strong><span data-i18n="hero.stat1">эко-школ</span></div>
+          <div class="stat"><strong>100 000+</strong><span data-i18n="hero.stat2">волонтёров</span></div>
+          <div class="stat"><strong>20 млрд</strong><span data-i18n="hero.stat3">сумов господдержки</span></div>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <span class="emoji">🌍</span>
+        <div class="float-badge b1">♻️ <span data-i18n="hero.badge1">Сортируй отходы</span></div>
+        <div class="float-badge b2">💧 <span data-i18n="hero.badge2">Береги воду</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="ecomap">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="map.eyebrow">Интерактивная карта</span>
+      <h2 data-i18n="map.title">EcoMap Узбекистана</h2>
+      <p data-i18n="map.subtitle">Эко-школы, пункты приёма вторсырья, проблемные зоны и качество воздуха.</p>
+    </div>
+    <div class="map-layout">
+        <div class="map-with-wind">
+      <div id="map"></div>
+              <canvas id="windCanvas" class="wind-canvas"></canvas>
+                      </div>
+      <aside class="map-side">
+      <button id="reportBtn" class="report-btn" data-i18n="report.btn">📸 Сообщить о проблеме</button>
+      <button id="windToggle" class="wind-toggle" data-i18n="wind.btn">💨 Дыхание планеты</button>
+      <div class="layer-toggle">
+  <h3 data-i18n="map.layers">Слои карты</h3>
+  <label class="layer-item"><input type="checkbox" id="layerSchools" checked><span class="dot school"></span><span data-i18n="map.layerSchools">Эко-школы</span></label>
+  <label class="layer-item"><input type="checkbox" id="layerProblems" checked><span class="dot problem"></span><span data-i18n="map.layerProblems">Проблемные зоны</span></label>
+  <label class="layer-item"><input type="checkbox" id="layerRecycle" checked><span class="dot recycle"></span><span data-i18n="map.layerRecycle">Приём вторсырья</span></label>
+  <label class="layer-item"><input type="checkbox" id="layerNature" checked><span class="dot nature"></span><span data-i18n="map.layerNature">Заповедники и парки</span></label>
+  <label class="layer-item"><input type="checkbox" id="layerIndustry"><span class="dot industry"></span><span data-i18n="map.layerIndustry">Крупные предприятия</span></label>
+  <label class="layer-item"><input type="checkbox" id="layerStations"><span class="dot station"></span><span data-i18n="map.layerStations">Станции мониторинга</span></label>
+  <label class="layer-item"><input type="checkbox" id="layerGlobalAqi"><span class="dot global"></span><span data-i18n="map.layerGlobalAqi">Мировой AQI</span></label>
+  <p class="legend-note" data-i18n="map.legendNote">Кликните по маркеру для деталей. Shift+клик по карте — сообщить о проблеме.</p>
+</div>
+  </div>
+</section>
+
+<section class="section" id="volunteer">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="vol.eyebrow">Volunteer Hub</span>
+      <h2 data-i18n="vol.title">Стань волонтёром</h2>
+      <p data-i18n="vol.subtitle">Присоединяйся к уборкам, посадке деревьев и plogging-забегам.</p>
+    </div>
+    <div class="vol-grid">
+      <div class="card form-card">
+        <h3 data-i18n="vol.formTitle">Регистрация волонтёра</h3>
+        <p class="sub" data-i18n="vol.formSub">Заполни форму — сообщим о ближайших акциях.</p>
+        <form id="volForm" novalidate>
+          <div class="field"><label for="vname" data-i18n="vol.name">Имя и фамилия</label><input type="text" id="vname" required></div>
+          <div class="field-row">
+            <div class="field"><label for="vcity" data-i18n="vol.city">Город</label>
+              <select id="vcity" required><option value="">—</option><option>Ташкент</option><option>Самарканд</option><option>Бухара</option><option>Нукус</option><option>Андижан</option><option>Фергана</option><option>Наманган</option><option>Ургенч</option></select>
+            </div>
+            <div class="field"><label for="vphone" data-i18n="vol.phone">Телефон</label><input type="tel" id="vphone" required placeholder="+998"></div>
+          </div>
+          <div class="field"><label for="vtype" data-i18n="vol.type">Направление</label>
+            <select id="vtype">
+              <option data-i18n="vol.type1">Уборка территорий</option>
+              <option data-i18n="vol.type2">Посадка деревьев</option>
+              <option data-i18n="vol.type3">Plogging</option>
+              <option data-i18n="vol.type4">Эко-просвещение</option>
+              <option data-i18n="vol.type5">Раздельный сбор</option>
+            </select>
+          </div>
+          <div class="field"><label for="vmsg" data-i18n="vol.msg">Комментарий</label><textarea id="vmsg" rows="3"></textarea></div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center" data-i18n="vol.submit">Отправить заявку</button>
+        </form>
+      </div>
+      <div>
+        <h3 style="margin-bottom:1rem;color:var(--green-900)" data-i18n="vol.events">Ближайшие события</h3>
+        <div class="events">
+          <div class="event">
+            <div class="event-date"><b>05</b><small data-i18n="vol.month.apr">апр</small></div>
+            <div class="event-info"><h4 data-i18n="vol.ev1.title">Чистый Чирчик</h4><p data-i18n="vol.ev1.desc">Уборка берега реки · Ташкентская область · 120 мест</p></div>
+          </div>
+          <div class="event">
+            <div class="event-date"><b>12</b><small data-i18n="vol.month.apr">апр</small></div>
+            <div class="event-info"><h4 data-i18n="vol.ev2.title">Зелёный Самарканд</h4><p data-i18n="vol.ev2.desc">Посадка 500 деревьев · Самарканд · 300 мест</p></div>
+          </div>
+          <div class="event">
+            <div class="event-date"><b>22</b><small data-i18n="vol.month.apr">апр</small></div>
+            <div class="event-info"><h4 data-i18n="vol.ev3.title">Plogging в Нукусе</h4><p data-i18n="vol.ev3.desc">Ко Дню Земли · Нукус · 80 мест</p></div>
+          </div>
+        </div>
+        <div class="story-card" style="margin-bottom:1rem">
+          <p class="quote" data-i18n="vol.story">«Я собрала больше тонны мусора на переработку вместе с друзьями из Приаралья.»</p>
+          <div class="author">
+            <div class="avatar">А</div>
+            <div><b>Альбина</b><span data-i18n="vol.storyRole">Волонтёр, Каракалпакстан</span></div>
+          </div>
+        </div>
+        <div class="gov-card">
+          <h4>🏛️ <span data-i18n="vol.govTitle">Господдержка волонтёров</span></h4>
+          <p data-i18n-html="vol.govText">Фонд поддержки волонтёров — годовой бюджет <strong>20 млрд сумов</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="calculator">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="calc.eyebrow">Carbon Footprint</span>
+      <h2 data-i18n="calc.title">Калькулятор углеродного следа</h2>
+      <p data-i18n="calc.subtitle">Введите средние данные за месяц — узнайте свой CO₂-след.</p>
+    </div>
+    <div class="calc-layout">
+      <form class="calc-form" id="calcForm">
+        <div class="card">
+          <div class="field-row">
+            <div class="field"><label for="cElec" data-i18n="calc.elec">⚡ Электричество, кВт·ч/мес</label><input type="number" id="cElec" min="0" value="250"></div>
+            <div class="field"><label for="cGas" data-i18n="calc.gas">🔥 Газ, м³/мес</label><input type="number" id="cGas" min="0" value="40"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="cFuel" data-i18n="calc.fuel">🚗 Бензин, л/мес</label><input type="number" id="cFuel" min="0" value="60"></div>
+            <div class="field"><label for="cWater" data-i18n="calc.water">💧 Вода, м³/мес</label><input type="number" id="cWater" min="0" value="8"></div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="cWaste" data-i18n="calc.waste">🗑️ Отходы, кг/мес</label><input type="number" id="cWaste" min="0" value="25"></div>
+            <div class="field"><label for="cTransit" data-i18n="calc.transit">🚌 Транспорт, км/мес</label><input type="number" id="cTransit" min="0" value="150"></div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:.5rem" data-i18n="calc.submit">Рассчитать CO₂ →</button>
+        </div>
+      </form>
+      <div class="result-card">
+        <h3 data-i18n="calc.resultTitle">Ваш углеродный след</h3>
+        <div class="result-total"><span id="resTotal">0.00</span> <small>т/год</small></div>
+        <p class="result-sub" data-i18n="calc.resultSub">Примерный объём выбросов CO₂</p>
+        <div class="result-bars">
+          <div class="result-bar"><label><span data-i18n="calc.barElec">Электричество</span><span id="valElec">0 кг</span></label><div class="bar-track"><div class="bar-fill" id="barElec"></div></div></div>
+          <div class="result-bar"><label><span data-i18n="calc.barGas">Газ</span><span id="valGas">0 кг</span></label><div class="bar-track"><div class="bar-fill" id="barGas"></div></div></div>
+          <div class="result-bar"><label><span data-i18n="calc.barFuel">Бензин</span><span id="valFuel">0 кг</span></label><div class="bar-track"><div class="bar-fill" id="barFuel"></div></div></div>
+          <div class="result-bar"><label><span data-i18n="calc.barWater">Вода</span><span id="valWater">0 кг</span></label><div class="bar-track"><div class="bar-fill" id="barWater"></div></div></div>
+          <div class="result-bar"><label><span data-i18n="calc.barWaste">Отходы</span><span id="valWaste">0 кг</span></label><div class="bar-track"><div class="bar-fill" id="barWaste"></div></div></div>
+        </div>
+        <div class="result-compare" id="resCompare" data-i18n-html="calc.compare">Средний житель Узбекистана — около <b>2.5 т CO₂/год</b>.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="calendar">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="cal.eyebrow">Эко-календарь</span>
+      <h2 data-i18n="cal.title">Экологические даты Узбекистана</h2>
+      <p data-i18n="cal.subtitle">Идеи для мероприятий в школах и сообществах.</p>
+    </div>
+    <div class="cal-grid">
+      <article class="cal-card"><div class="date" data-i18n="cal.c1.date">22 марта</div><h4 data-i18n="cal.c1.title">Всемирный день воды 💧</h4><p data-i18n="cal.c1.desc">Привлекает внимание к проблеме пресной воды.</p><div class="idea" data-i18n="cal.c1.idea">💡 Идея: экскурсия на очистные сооружения.</div></article>
+      <article class="cal-card"><div class="date" data-i18n="cal.c2.date">22 апреля</div><h4 data-i18n="cal.c2.title">День Земли 🌍</h4><p data-i18n="cal.c2.desc">Международный праздник защиты природы.</p><div class="idea" data-i18n="cal.c2.idea">💡 Идея: посадка деревьев во дворе школы.</div></article>
+      <article class="cal-card"><div class="date" data-i18n="cal.c3.date">5 июня</div><h4 data-i18n="cal.c3.title">День эколога 🌿</h4><p data-i18n="cal.c3.desc">Праздник специалистов по охране природы.</p><div class="idea" data-i18n="cal.c3.idea">💡 Идея: встречи с экологами, квесты.</div></article>
+      <article class="cal-card"><div class="date" data-i18n="cal.c4.date">16 сентября</div><h4 data-i18n="cal.c4.title">День озонового слоя ☀️</h4><p data-i18n="cal.c4.desc">Приурочен к Монреальскому протоколу.</p><div class="idea" data-i18n="cal.c4.idea">💡 Идея: плакаты в классах.</div></article>
+      <article class="cal-card"><div class="date" data-i18n="cal.c5.date">14 октября</div><h4 data-i18n="cal.c5.title">День защиты животных 🐾</h4><p data-i18n="cal.c5.desc">О защите редких видов Центральной Азии.</p><div class="idea" data-i18n="cal.c5.idea">💡 Идея: лекция о снежном барсе.</div></article>
+      <article class="cal-card"><div class="date" data-i18n="cal.c6.date">15 ноября</div><h4 data-i18n="cal.c6.title">День переработки ♻️</h4><p data-i18n="cal.c6.desc">Популяризация раздельного сбора.</p><div class="idea" data-i18n="cal.c6.idea">💡 Идея: акция «Сдай макулатуру».</div></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="blog">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="blog.eyebrow">База знаний</span>
+      <h2 data-i18n="blog.title">Блог и статьи</h2>
+      <p data-i18n="blog.subtitle">Практические гиды, исследования и материалы о климате.</p>
+    </div>
+    <div class="blog-grid">
+      <article class="post"><div class="post-img">♻️</div><div class="post-body"><span class="post-tag" data-i18n="blog.post1.tag">Переработка</span><h4 data-i18n="blog.post1.title">Как правильно сортировать мусор дома</h4><p data-i18n="blog.post1.desc">Пошаговый гид: пластик, бумага, стекло и опасные отходы.</p><a href="#" class="read" data-i18n="blog.read">Читать →</a></div></article>
+      <article class="post"><div class="post-img">🥗</div><div class="post-body"><span class="post-tag" data-i18n="blog.post2.tag">Устойчивое питание</span><h4 data-i18n="blog.post2.title">Проект FAO и Zamin Foundation</h4><p data-i18n="blog.post2.desc">Как устойчивое питание снижает углеродный след семьи.</p><a href="#" class="read" data-i18n="blog.read">Читать →</a></div></article>
+      <article class="post"><div class="post-img">🏔️</div><div class="post-body"><span class="post-tag" data-i18n="blog.post3.tag">Климат</span><h4 data-i18n="blog.post3.title">Изменение климата в Центральной Азии</h4><p data-i18n="blog.post3.desc">Таяние ледников, дефицит воды, опустынивание.</p><a href="#" class="read" data-i18n="blog.read">Читать →</a></div></article>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="schools">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="sch.eyebrow">Достижения</span>
+      <h2 data-i18n="sch.title">Рейтинг эко-школ Узбекистана</h2>
+      <p data-i18n="sch.subtitle">Green Flag — высшая награда программы Eco-Schools.</p>
+    </div>
+
+    <div class="schools-stats">
+      <div class="stat-box">
+        <div class="stat-icon">🏫</div>
+        <div class="stat-number">257+</div>
+        <div class="stat-label" data-i18n="sch.stat1">Эко-школ в программе</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🏆</div>
+        <div class="stat-number">42</div>
+        <div class="stat-label" data-i18n="sch.stat2">Получили Green Flag</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">🥈</div>
+        <div class="stat-number">89</div>
+        <div class="stat-label" data-i18n="sch.stat3">На пути к флагу</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-icon">📈</div>
+        <div class="stat-number">126</div>
+        <div class="stat-label" data-i18n="sch.stat4">Начали программу</div>
+      </div>
+    </div>
+
+    <div class="schools-filter">
+      <button class="filter-btn active" data-region="all" data-i18n="sch.filter.all">Все</button>
+      <button class="filter-btn" data-region="tashkent" data-i18n="sch.filter.tashkent">Ташкент</button>
+      <button class="filter-btn" data-region="samarkand" data-i18n="sch.filter.samarkand">Самарканд</button>
+      <button class="filter-btn" data-region="bukhara" data-i18n="sch.filter.bukhara">Бухара</button>
+      <button class="filter-btn" data-region="fergana" data-i18n="sch.filter.fergana">Фергана</button>
+      <button class="filter-btn" data-region="nukus" data-i18n="sch.filter.nukus">Нукус</button>
+    </div>
+
+    <div class="schools-rating" id="schoolsRating"></div>
+  </div>
+</section>
+<section class="section" id="about">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow" data-i18n="about.eyebrow">О проекте</span>
+      <h2 data-i18n="about.title">Почему Ecogen</h2>
+      <p data-i18n="about.subtitle">Единая цифровая платформа для школьников, учителей и волонтёров.</p>
+    </div>
+    <div class="about-grid">
+      <div class="about-card"><div class="icon">🌐</div><h4 data-i18n="about.c1">Реальные данные</h4><p data-i18n="about.c1t">Интеграция с Open-Meteo, координаты 257+ эко-школ.</p></div>
+      <div class="about-card"><div class="icon">📚</div><h4 data-i18n="about.c2">Образование</h4><p data-i18n="about.c2t">Материалы для уроков, эко-календарь, база знаний.</p></div>
+      <div class="about-card"><div class="icon">🤝</div><h4 data-i18n="about.c3">Сообщество</h4><p data-i18n="about.c3t">Более 100 000 волонтёров, гранты, истории успеха.</p></div>
+      <div class="about-card"><div class="icon">♿</div><h4 data-i18n="about.c4">Доступность</h4><p data-i18n="about.c4t">Контрастный интерфейс, alt-тексты, масштабирование шрифта.</p></div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="container">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <div class="logo"><span class="logo-mark">🌿</span> Eco<span style="color:var(--green-300)">gen</span></div>
+        <p data-i18n="foot.desc">Цифровая платформа экологического образования и проект Eco-Schools Uzbekistan.</p>
+      </div>
+      <div class="foot-col"><h5 data-i18n="foot.nav">Навигация</h5><a href="#ecomap">EcoMap</a><a href="#volunteer">Волонтёрство</a><a href="#calculator">Калькулятор</a><a href="#blog">Блог</a></div>
+      <div class="foot-col"><h5 data-i18n="foot.res">Ресурсы</h5><a href="#">Eco-Schools</a><a href="#">Open-Meteo</a><a href="#">Zamin Foundation</a><a href="#">FAO Uzbekistan</a></div>
+      <div class="foot-col"><h5 data-i18n="foot.contact">Контакты</h5><a href="#">📧 info@ecogen.uz</a><a href="#">💬 Telegram-бот</a><a href="#">📍 Ташкент</a></div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Ecogen. <span data-i18n="foot.rights">Все права защищены.</span></span>
+      <span data-i18n="foot.made">Сделано с 💚 для зелёного будущего</span>
+    </div>
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="report-modal" id="reportModal">
+  <div class="report-modal-content">
+    <button class="report-modal-close" id="reportClose" aria-label="Закрыть">×</button>
+    <h3>📸 Сообщить о проблеме</h3>
+    <p class="report-coords" id="reportCoords"></p>
+    <form id="reportForm">
+      <div class="field">
+        <label>Фото проблемы (необязательно)</label>
+        <input type="file" id="reportPhoto" accept="image/*">
+        <div class="report-photo-preview" id="reportPhotoPreview"></div>
+      </div>
+      <div class="field">
+        <label>Тип проблемы</label>
+        <select id="reportType">
+          <option value="trash">🗑️ Мусор</option>
+          <option value="water">💧 Загрязнение воды</option>
+          <option value="air">💨 Загрязнение воздуха</option>
+          <option value="soil">🌱 Загрязнение почвы</option>
+          <option value="other">⚠️ Другое</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Описание проблемы</label>
+        <textarea id="reportDesc" rows="3" placeholder="Опишите что произошло..."></textarea>
+      </div>
+      <div class="field">
+        <label>Ваше имя (необязательно)</label>
+        <input type="text" id="reportName" placeholder="Ваше имя">
+      </div>
+      <div class="report-actions">
+        <button type="button" class="btn btn-outline" id="reportCancel">Отмена</button>
+        <button type="submit" class="btn btn-primary">Отправить заявку</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<button id="toTop" aria-label="Наверх">↑</button>
+
+<script>
+/* =========================================================
+   1. ПЕРЕВОДЫ
+   ========================================================= */
+const i18n = {
+  ru:{
+    "nav.home":"Главная","nav.map":"EcoMap","nav.volunteer":"Волонтёрство","nav.calculator":"Калькулятор","nav.calendar":"Календарь","nav.blog":"Блог","nav.about":"О проекте",
+    "hero.eyebrow":"Экологическое образование в Узбекистане","hero.title":"Генерация <em>экологического</em> будущего",
+    "hero.subtitle":"Ecogen объединяет школьников, учителей и волонтёров по всему Узбекистану. Интерактивная карта, калькулятор CO₂ и реальные инструменты для улучшения среды.",
+    "hero.cta1":"Открыть EcoMap →","hero.cta2":"Стать волонтёром",
+    "hero.stat1":"эко-школ","hero.stat2":"волонтёров","hero.stat3":"сумов господдержки",
+    "hero.badge1":"Сортируй отходы","hero.badge2":"Береги воду",
+    "map.eyebrow":"Интерактивная карта","map.title":"EcoMap Узбекистана","map.subtitle":"Эко-школы, пункты приёма вторсырья, проблемные зоны и качество воздуха.",
+    "map.layers":"Слои карты","map.layerSchools":"Эко-школы","map.layerProblems":"Проблемные зоны","map.layerRecycle":"Приём вторсырья",
+    "map.legendNote":"Кликните по маркеру для деталей. Shift+клик по карте — сообщить о проблеме.","map.layerNature":"Заповедники и парки","map.layerIndustry":"Крупные предприятия","map.layerStations":"Станции мониторинга","map.layerGlobalAqi":"Мировой AQI","forecast.loading":"Загрузка прогноза...",
+    "map.aqi":"Качество воздуха (AQI)","map.aqiSource":"Источник: Open-Meteo.com",
+    "aqi.city.tashkent":"Ташкент","aqi.city.samarkand":"Самарканд","aqi.city.bukhara":"Бухара","aqi.city.nukus":"Нукус","aqi.city.andijan":"Андижан",
+    "vol.eyebrow":"Volunteer Hub","vol.title":"Стань волонтёром","vol.subtitle":"Присоединяйся к уборкам, посадке деревьев и plogging-забегам.",
+    "vol.formTitle":"Регистрация волонтёра","vol.formSub":"Заполни форму — сообщим о ближайших акциях в твоём городе.",
+    "vol.name":"Имя и фамилия","vol.city":"Город","vol.phone":"Телефон","vol.type":"Направление","vol.msg":"Комментарий (необязательно)",
+    "vol.type1":"Уборка территорий","vol.type2":"Посадка деревьев","vol.type3":"Plogging (бег + сбор мусора)","vol.type4":"Эко-просвещение в школах","vol.type5":"Раздельный сбор отходов",
+    "vol.submit":"Отправить заявку","vol.events":"Ближайшие события","vol.month.apr":"апр",
+    "vol.ev1.title":"Чистый Чирчик","vol.ev1.desc":"Уборка берега реки · Ташкентская область · 120 мест",
+    "vol.ev2.title":"Зелёный Самарканд","vol.ev2.desc":"Посадка 500 деревьев · Самарканд · 300 мест",
+    "vol.ev3.title":"Plogging в Нукусе","vol.ev3.desc":"Ко Дню Земли · Нукус · 80 мест",
+    "vol.story":"«Я собрала больше тонны мусора на переработку вместе с друзьями из Приаралья. Каждый может изменить своё сообщество — главное начать.»",
+    "vol.storyRole":"Волонтёр, Каракалпакстан","vol.govTitle":"Господдержка волонтёров",
+    "vol.govText":"Фонд поддержки волонтёров при Агентстве по делам молодёжи — годовой бюджет <strong>20 млрд сумов</strong>. Гранты на экопроекты.",
+    "calc.eyebrow":"Carbon Footprint","calc.title":"Калькулятор углеродного следа","calc.subtitle":"Введите средние данные за месяц — узнайте свой CO₂-след.",
+    "calc.elec":"⚡ Электричество, кВт·ч/мес","calc.gas":"🔥 Газ, м³/мес","calc.fuel":"🚗 Бензин, л/мес","calc.water":"💧 Вода, м³/мес","calc.waste":"🗑️ Отходы, кг/мес","calc.transit":"🚌 Транспорт, км/мес",
+    "calc.submit":"Рассчитать CO₂ →","calc.resultTitle":"Ваш углеродный след","calc.resultSub":"Примерный объём выбросов CO₂-эквивалента",
+    "calc.barElec":"Электричество","calc.barGas":"Газ","calc.barFuel":"Бензин","calc.barWater":"Вода","calc.barWaste":"Отходы",
+    "calc.compare":"Средний житель Узбекистана — около <b>2.5 т CO₂/год</b>. Мировой средний — <b>4.7 т</b>.",
+    "cal.eyebrow":"Эко-календарь","cal.title":"Экологические даты Узбекистана","cal.subtitle":"Идеи для мероприятий в школах и сообществах.",
+    "cal.c1.date":"22 марта","cal.c1.title":"Всемирный день воды 💧","cal.c1.desc":"Привлекает внимание к проблеме пресной воды.","cal.c1.idea":"💡 Идея: экскурсия на очистные сооружения + акция «Чистый арык».",
+    "cal.c2.date":"22 апреля","cal.c2.title":"День Земли 🌍","cal.c2.desc":"Международный праздник защиты природы.","cal.c2.idea":"💡 Идея: посадка деревьев во дворе школы, plogging.",
+    "cal.c3.date":"5 июня","cal.c3.title":"День эколога 🌿","cal.c3.desc":"Праздник специалистов по охране природы.","cal.c3.idea":"💡 Идея: встречи с экологами, научные квесты.",
+    "cal.c4.date":"16 сентября","cal.c4.title":"День озонового слоя ☀️","cal.c4.desc":"Приурочен к Монреальскому протоколу.","cal.c4.idea":"💡 Идея: плакаты «Сохрани озоновый щит».",
+    "cal.c5.date":"14 октября","cal.c5.title":"День защиты животных 🐾","cal.c5.desc":"О защите редких видов Центральной Азии.","cal.c5.idea":"💡 Идея: лекция о снежном барсе, помощь приютам.",
+    "cal.c6.date":"15 ноября","cal.c6.title":"День переработки ♻️","cal.c6.desc":"Популяризация раздельного сбора и переработки.","cal.c6.idea":"💡 Идея: акция «Сдай макулатуру — спаси дерево».",
+    "blog.eyebrow":"База знаний","blog.title":"Блог и статьи","blog.subtitle":"Практические гиды, исследования о климате Центральной Азии.",
+    "blog.read":"Читать →",
+    "blog.post1.tag":"Переработка","blog.post1.title":"Как правильно сортировать мусор дома","blog.post1.desc":"Пошаговый гид: пластик, бумага, стекло и опасные отходы. Куда сдавать в Ташкенте.",
+    "blog.post2.tag":"Устойчивое питание","blog.post2.title":"Проект FAO и Zamin Foundation","blog.post2.desc":"Что такое устойчивое питание и как оно снижает углеродный след семьи.",
+    "blog.post3.tag":"Климат","blog.post3.title":"Изменение климата в Центральной Азии","blog.post3.desc":"Таяние ледников, дефицит воды, опустынивание Приаралья.",
+    "sch.eyebrow":"Достижения","sch.title":"Школы на пути к Зелёному флагу","sch.subtitle":"Green Flag — высшая награда международной программы Eco-Schools.",
+    "sch.progress":"Прогресс к Green Flag","sch.s1.name":"Школа №112","sch.s2.name":"Школа №48","sch.s3.name":"Школа №7",
+    "sch.city.tashkent":"г. Ташкент","sch.city.samarkand":"г. Самарканд","sch.city.nukus":"г. Нукус",
+    "sch.step.audit":"✅ Аудит","sch.step.plan":"✅ План действий","sch.step.monitor":"✅ Мониторинг","sch.stat1":"Эко-школ в программе","sch.stat2":"Получили Green Flag","sch.stat3":"На пути к флагу","sch.stat4":"Начали программу","sch.filter.all":"Все","sch.filter.tashkent":"Ташкент","sch.filter.samarkand":"Самарканд","sch.filter.bukhara":"Бухара","sch.filter.fergana":"Фергана","sch.filter.nukus":"Нукус","sch.table.school":"Школа","sch.table.status":"Статус","sch.table.progress":"Прогресс",
+    "about.eyebrow":"О проекте","about.title":"Почему Ecogen","about.subtitle":"Единая цифровая платформа для школьников, учителей и волонтёров.",
+    "about.c1":"Реальные данные","about.c1t":"Интеграция с Open-Meteo, координаты 257+ эко-школ, статистика волонтёрских акций.",
+    "about.c2":"Образование","about.c2t":"Материалы для уроков, эко-календарь, база знаний.",
+    "about.c3":"Сообщество","about.c3t":"Более 100 000 волонтёров, гранты, наставники и реальные истории успеха.",
+    "about.c4":"Доступность","about.c4t":"Контрастный интерфейс, alt-тексты, масштабирование шрифта.",
+    "foot.desc":"Цифровая платформа экологического образования и проект Eco-Schools Uzbekistan.",
+    "foot.nav":"Навигация","foot.res":"Ресурсы","foot.contact":"Контакты",
+    "foot.rights":"Все права защищены.","foot.made":"Сделано с 💚 для зелёного будущего","foot.visits":"Посещений:",
+    "toast.vol":"✅ Спасибо! Ваша заявка отправлена.","toast.problem":"📍 Точка проблемы добавлена на карту.","report.btn":"📸 Сообщить о проблеме","report.title":"Сообщить о проблеме","report.pickOnMap":"Кликните на карту","report.photo":"Фото проблемы (необязательно)","report.type":"Тип проблемы","report.type.trash":"🗑️ Мусор","report.type.water":"💧 Загрязнение воды","report.type.air":"💨 Загрязнение воздуха","report.type.soil":"🌱 Загрязнение почвы","report.type.other":"⚠️ Другое","report.desc":"Описание","report.descPlaceholder":"Опишите проблему...","report.name":"Ваше имя (необязательно)","report.submit":"Отправить заявку","report.cancel":"Отмена","report.success":"Заявка отправлена!","wind.btn":"💨 Дыхание планеты"
+  },
+  uz:{
+    "nav.home":"Asosiy","nav.map":"EcoMap","nav.volunteer":"Volontyorlik","nav.calculator":"Kalkulyator","nav.calendar":"Kalendar","nav.blog":"Blog","nav.about":"Loyiha haqida",
+    "hero.eyebrow":"O'zbekistonda ekologik ta'lim","hero.title":"<em>Ekologik</em> kelajakni yaratish",
+    "hero.subtitle":"Ecogen O'zbekiston bo'ylab o'quvchilar, o'qituvchilar va volontyorlarni birlashtiradi.",
+    "hero.cta1":"EcoMap'ni ochish →","hero.cta2":"Volontyor bo'lish",
+    "hero.stat1":"eko-maktab","hero.stat2":"volontyor","hero.stat3":"so'm davlat yordami",
+    "hero.badge1":"Chiqindini sarala","hero.badge2":"Suvni tejang",
+    "map.eyebrow":"Interaktiv xarita","map.title":"O'zbekiston EcoMap","map.subtitle":"Eko-maktablar, qayta ishlash punktlari, muammoli zonalar va havo sifati.",
+    "map.layers":"Xarita qatlamlari","map.layerSchools":"Eko-maktablar","map.layerProblems":"Muammoli zonalar","map.layerRecycle":"Qayta ishlash punktlari",
+    "map.legendNote":"Batafsil ma'lumot uchun markerga bosing. Shift bilan xaritaga bosing.",
+    "map.layerNature":"Qo'riqxonalar va bog'lar","map.layerIndustry":"Yirik korxonalar","map.layerStations":"Monitoring stantsiyalari","map.layerGlobalAqi":"Jahon AQI","forecast.loading":"Prognoz yuklanmoqda...","map.layerNature":"Qo'riqxonalar va bog'lar","map.layerIndustry":"Yirik korxonalar","map.layerStations":"Monitoring stantsiyalari","map.aqi":"Havo sifati (AQI)","map.aqiSource":"Manba: Open-Meteo.com",
+    "aqi.city.tashkent":"Toshkent","aqi.city.samarkand":"Samarqand","aqi.city.bukhara":"Buxoro","aqi.city.nukus":"Nukus","aqi.city.andijan":"Andijon",
+    "vol.eyebrow":"Volunteer Hub","vol.title":"Volontyor bo'ling","vol.subtitle":"Tozalash, daraxt ekish va plogging tadbirlariga qo'shiling.",
+    "vol.formTitle":"Volontyor ro'yxatdan o'tish","vol.formSub":"Shaklni to'ldiring — shahringizdagi tadbirlar haqida xabar beramiz.",
+    "vol.name":"Ism va familiya","vol.city":"Shahar","vol.phone":"Telefon","vol.type":"Yo'nalish","vol.msg":"Izoh (majburiy emas)",
+    "vol.type1":"Hududlarni tozalash","vol.type2":"Daraxt ekish","vol.type3":"Plogging","vol.type4":"Maktablarda eko-ma'rifat","vol.type5":"Chiqindini ajratish",
+    "vol.submit":"Ariza yuborish","vol.events":"Yaqin tadbirlar","vol.month.apr":"apr",
+    "vol.ev1.title":"Toza Chirchiq","vol.ev1.desc":"Daryo bo'yini tozalash · Toshkent viloyati · 120 joy",
+    "vol.ev2.title":"Yashil Samarqand","vol.ev2.desc":"500 daraxt ekish · Samarqand · 300 joy",
+    "vol.ev3.title":"Nuqusda plogging","vol.ev3.desc":"Yer kuni munosabati bilan · Nuqus · 80 joy",
+    "vol.story":"«Men Orolbo'yi do'stlarim bilan bir tonnadan ortiq chiqindini qayta ishlashga topshirdim.»",
+    "vol.storyRole":"Volontyor, Qoraqalpog'iston","vol.govTitle":"Volontyorlarni davlat qo'llab-quvvatlashi",
+    "vol.govText":"Yoshlar ishlari agentligi huzuridagi jamg'arma — yillik byudjeti <strong>20 mlrd so'm</strong>.",
+    "calc.eyebrow":"Carbon Footprint","calc.title":"Uglerod izi kalkulyatori","calc.subtitle":"Oylik ma'lumotlarni kiriting va CO₂ chiqarishingizni bilib oling.",
+    "calc.elec":"⚡ Elektr, kVt·soat/oy","calc.gas":"🔥 Gaz, m³/oy","calc.fuel":"🚗 Benzin, l/oy","calc.water":"💧 Suv, m³/oy","calc.waste":"🗑️ Chiqindi, kg/oy","calc.transit":"🚌 Transport, km/oy",
+    "calc.submit":"CO₂ hisoblash →","calc.resultTitle":"Sizning uglerod izingiz","calc.resultSub":"CO₂ ekvivalenti chiqindilarining taxminiy hajmi",
+    "calc.barElec":"Elektr","calc.barGas":"Gaz","calc.barFuel":"Benzin","calc.barWater":"Suv","calc.barWaste":"Chiqindi",
+    "calc.compare":"O'zbekistonning o'rtacha fuqarosi — <b>2.5 t CO₂/yil</b>. Jahon o'rtachasi — <b>4.7 t</b>.",
+    "cal.eyebrow":"Eko-kalendar","cal.title":"O'zbekiston ekologik sanalari","cal.subtitle":"Maktablar uchun tadbir g'oyalari.",
+    "cal.c1.date":"22 mart","cal.c1.title":"Jahon suv kuni 💧","cal.c1.desc":"Chuchuk suv muammosi.","cal.c1.idea":"💡 G'oya: tozalash inshootlariga ekskursiya.",
+    "cal.c2.date":"22 aprel","cal.c2.title":"Yer kuni 🌍","cal.c2.desc":"Atrof-muhit bayrami.","cal.c2.idea":"💡 G'oya: maktab hovlisida daraxt ekish.",
+    "cal.c3.date":"5 iyun","cal.c3.title":"Ekolog kuni 🌿","cal.c3.desc":"Tabiat mutaxassislarining bayrami.","cal.c3.idea":"💡 G'oya: ekologlar bilan uchrashuvlar.",
+    "cal.c4.date":"16 sentabr","cal.c4.title":"Ozon qatlami kuni ☀️","cal.c4.desc":"Monreal protokoli.","cal.c4.idea":"💡 G'oya: sinflarda plakatlar.",
+    "cal.c5.date":"14 oktabr","cal.c5.title":"Hayvonlarni himoya qilish kuni 🐾","cal.c5.desc":"Noyob turlarni himoya qilish.","cal.c5.idea":"💡 G'oya: qor barsi haqida ma'ruza.",
+    "cal.c6.date":"15 noyabr","cal.c6.title":"Qayta ishlash kuni ♻️","cal.c6.desc":"Chiqindilarni ajratish.","cal.c6.idea":"💡 G'oya: «Makulaturani topshir» aksiyasi.",
+    "blog.eyebrow":"Bilim bazasi","blog.title":"Blog va maqolalar","blog.subtitle":"Markaziy Osiyo iqlimi haqida amaliy qo'llanmalar.",
+    "blog.read":"O'qish →",
+    "blog.post1.tag":"Qayta ishlash","blog.post1.title":"Uyda chiqindini qanday to'g'ri ajratish kerak","blog.post1.desc":"Bosqichma-bosqich qo'llanma: plastik, qog'oz, shisha.",
+    "blog.post2.tag":"Barqaror ovqatlanish","blog.post2.title":"FAO va Zamin Foundation loyihasi","blog.post2.desc":"Barqaror ovqatlanish va uglerod izi.",
+    "blog.post3.tag":"Iqlim","blog.post3.title":"Markaziy Osiyoda iqlim o'zgarishi","blog.post3.desc":"Muzliklarning erishi, suv tanqisligi.",
+    "sch.eyebrow":"Yutuqlar","sch.title":"Yashil bayroq sari maktablar","sch.subtitle":"Green Flag — Eco-Schools dasturining eng yuqori mukofoti.",
+    "sch.progress":"Green Flag sari taraqqiyot","sch.s1.name":"112-maktab","sch.s2.name":"48-maktab","sch.s3.name":"7-maktab",
+    "sch.city.tashkent":"Toshkent sh.","sch.city.samarkand":"Samarqand sh.","sch.city.nukus":"Nuqus sh.",
+    "sch.step.audit":"✅ Audit","sch.step.plan":"✅ Harakatlar rejasi","sch.step.monitor":"✅ Monitoring","sch.step.apply":"🔄 Yakuniy ariza","sch.stat1":"Dasturdagi eko-maktablar","sch.stat2":"Green Flag olganlar","sch.stat3":"Bayroq sari","sch.stat4":"Dasturni boshlaganlar","sch.filter.all":"Barchasi","sch.filter.tashkent":"Toshkent","sch.filter.samarkand":"Samarqand","sch.filter.bukhara":"Buxoro","sch.filter.fergana":"Farg'ona","sch.filter.nukus":"Nukus","sch.table.school":"Maktab","sch.table.status":"Holat","sch.table.progress":"Taraqqiyot",
+    "about.eyebrow":"Loyiha haqida","about.title":"Nega Ecogen","about.subtitle":"O'quvchilar va volontyorlar uchun platforma.",
+    "about.c1":"Haqiqiy ma'lumotlar","about.c1t":"Open-Meteo integratsiyasi, 257+ eko-maktab koordinatalari.",
+    "about.c2":"Ta'lim","about.c2t":"Dars materiallari, eko-kalendar, bilim bazasi.",
+    "about.c3":"Jamiyat","about.c3t":"100 000+ volontyor, grantlar va muvaffaqiyat hikoyalari.",
+    "about.c4":"Qulaylik","about.c4t":"Kontrastli interfeys, alt-matnlar, shrift masshtablash.",
+    "foot.desc":"Ekologik ta'lim raqamli platformasi va Eco-Schools Uzbekistan loyihasi.",
+    "foot.nav":"Navigatsiya","foot.res":"Resurslar","foot.contact":"Aloqa",
+    "foot.rights":"Barcha huquqlar himoyalangan.","foot.made":"💚 Yashil kelajak uchun yaratilgan","foot.visits":"Tashriflar:",
+    "toast.vol":"✅ Rahmat! Arizangiz yuborildi.","toast.problem":"📍 Muammo nuqtasi xaritaga qo'shildi.","report.btn":"📸 Muammo haqida xabar","report.title":"Muammo haqida xabar","report.pickOnMap":"Xaritaga bosing","report.photo":"Muammo fotosurati (majburiy emas)","report.type":"Muammo turi","report.type.trash":"🗑️ Chiqindi","report.type.water":"💧 Suv ifloslanishi","report.type.air":"💨 Havo ifloslanishi","report.type.soil":"🌱 Tuproq ifloslanishi","report.type.other":"⚠️ Boshqa","report.desc":"Tavsif","report.descPlaceholder":"Muammoni tavsiflang...","report.name":"Ismingiz (majburiy emas)","report.submit":"Yuborish","report.cancel":"Bekor qilish","report.success":"Xabar yuborildi!","wind.btn":"💨 Sayyora nafasi"
+  },
+  en:{
+    "nav.home":"Home","nav.map":"EcoMap","nav.volunteer":"Volunteer","nav.calculator":"Calculator","nav.calendar":"Calendar","nav.blog":"Blog","nav.about":"About",
+    "hero.eyebrow":"Environmental education in Uzbekistan","hero.title":"Generating an <em>ecological</em> future",
+    "hero.subtitle":"Ecogen connects students, teachers and volunteers across Uzbekistan.",
+    "hero.cta1":"Open EcoMap →","hero.cta2":"Become a volunteer",
+    "hero.stat1":"eco-schools","hero.stat2":"volunteers","hero.stat3":"UZS gov. support",
+    "hero.badge1":"Sort your waste","hero.badge2":"Save water",
+    "map.eyebrow":"Interactive map","map.title":"Uzbekistan EcoMap","map.subtitle":"Eco-schools, recycling points, problem zones and air quality.",
+    "map.layers":"Map layers","map.layerSchools":"Eco-schools","map.layerProblems":"Problem zones","map.layerRecycle":"Recycling points",
+    "map.legendNote":"Click a marker for details. Shift+click on the map to report an issue.",
+    "map.layerNature":"Nature reserves","map.layerIndustry":"Major industry","map.layerStations":"Monitoring stations","map.layerGlobalAqi":"Global AQI","forecast.loading":"Loading forecast...","map.aqi":"Air quality (AQI)","map.aqiSource":"Source: Open-Meteo.com",
+    "aqi.city.tashkent":"Tashkent","aqi.city.samarkand":"Samarkand","aqi.city.bukhara":"Bukhara","aqi.city.nukus":"Nukus","aqi.city.andijan":"Andijan",
+    "vol.eyebrow":"Volunteer Hub","vol.title":"Become a volunteer","vol.subtitle":"Join cleanups, tree planting and plogging events.",
+    "vol.formTitle":"Volunteer registration","vol.formSub":"Fill the form — we'll notify you about events in your city.",
+    "vol.name":"Full name","vol.city":"City","vol.phone":"Phone","vol.type":"Area","vol.msg":"Comment (optional)",
+    "vol.type1":"Territory cleanup","vol.type2":"Tree planting","vol.type3":"Plogging","vol.type4":"Eco-education in schools","vol.type5":"Waste sorting",
+    "vol.submit":"Submit application","vol.events":"Upcoming events","vol.month.apr":"Apr",
+    "vol.ev1.title":"Clean Chirchik","vol.ev1.desc":"River bank cleanup · Tashkent region · 120 spots",
+    "vol.ev2.title":"Green Samarkand","vol.ev2.desc":"Planting 500 trees · Samarkand · 300 spots",
+    "vol.ev3.title":"Plogging in Nukus","vol.ev3.desc":"Earth Day event · Nukus · 80 spots",
+    "vol.story":"«I collected over a ton of recyclable waste with my friends from the Aral region.»",
+    "vol.storyRole":"Volunteer, Karakalpakstan","vol.govTitle":"State support for volunteers",
+    "vol.govText":"Volunteer Support Fund — annual budget of <strong>20 billion UZS</strong>.",
+    "calc.eyebrow":"Carbon Footprint","calc.title":"Carbon footprint calculator","calc.subtitle":"Enter your monthly averages and find out your CO₂ emissions.",
+    "calc.elec":"⚡ Electricity, kWh/mo","calc.gas":"🔥 Gas, m³/mo","calc.fuel":"🚗 Petrol, L/mo","calc.water":"💧 Water, m³/mo","calc.waste":"🗑️ Waste, kg/mo","calc.transit":"🚌 Transport, km/mo",
+    "calc.submit":"Calculate CO₂ →","calc.resultTitle":"Your carbon footprint","calc.resultSub":"Estimated CO₂-equivalent emissions",
+    "calc.barElec":"Electricity","calc.barGas":"Gas","calc.barFuel":"Petrol","calc.barWater":"Water","calc.barWaste":"Waste",
+    "calc.compare":"Average Uzbek resident — about <b>2.5 t CO₂/year</b>. World average — <b>4.7 t</b>.",
+    "cal.eyebrow":"Eco-calendar","cal.title":"Ecological dates in Uzbekistan","cal.subtitle":"Event ideas for schools and communities.",
+    "cal.c1.date":"March 22","cal.c1.title":"World Water Day 💧","cal.c1.desc":"Freshwater problem and its conservation.","cal.c1.idea":"💡 Idea: treatment plant tour.",
+    "cal.c2.date":"April 22","cal.c2.title":"Earth Day 🌍","cal.c2.desc":"International environmental holiday.","cal.c2.idea":"💡 Idea: tree planting in school yard.",
+    "cal.c3.date":"June 5","cal.c3.title":"Ecologist Day 🌿","cal.c3.desc":"Professional holiday of conservation specialists.","cal.c3.idea":"💡 Idea: meetings with ecologists.",
+    "cal.c4.date":"September 16","cal.c4.title":"Ozone Layer Day ☀️","cal.c4.desc":"Marks the Montreal Protocol.","cal.c4.idea":"💡 Idea: posters in classrooms.",
+    "cal.c5.date":"October 14","cal.c5.title":"Animal Protection Day 🐾","cal.c5.desc":"About protecting rare species.","cal.c5.idea":"💡 Idea: lecture about snow leopard.",
+    "cal.c6.date":"November 15","cal.c6.title":"Recycling Day ♻️","cal.c6.desc":"Promoting separate collection.","cal.c6.idea":"💡 Idea: «Hand in waste paper» campaign.",
+    "blog.eyebrow":"Knowledge base","blog.title":"Blog & articles","blog.subtitle":"Practical guides and research on Central Asia's climate.",
+    "blog.read":"Read →",
+    "blog.post1.tag":"Recycling","blog.post1.title":"How to properly sort waste at home","blog.post1.desc":"Step-by-step guide: plastic, paper, glass and hazardous waste.",
+    "blog.post2.tag":"Sustainable nutrition","blog.post2.title":"Joint project of FAO and Zamin Foundation","blog.post2.desc":"What sustainable nutrition is and how it reduces a family's footprint.",
+    "blog.post3.tag":"Climate","blog.post3.title":"Climate change in Central Asia","blog.post3.desc":"Melting glaciers, water scarcity, Aral desertification.",
+    "sch.eyebrow":"Achievements","sch.title":"Schools on the path to Green Flag","sch.subtitle":"Green Flag — the highest award of the Eco-Schools programme.",
+    "sch.progress":"Progress to Green Flag","sch.s1.name":"School #112","sch.s2.name":"School #48","sch.s3.name":"School #7",
+    "sch.city.tashkent":"Tashkent","sch.city.samarkand":"Samarkand","sch.city.nukus":"Nukus",
+    "sch.step.audit":"✅ Audit","sch.step.plan":"✅ Action plan","sch.step.monitor":"✅ Monitoring","sch.step.apply":"🔄 Final application","sch.stat1":"Eco-schools in program","sch.stat2":"Received Green Flag","sch.stat3":"On the way","sch.stat4":"Started program","sch.filter.all":"All","sch.filter.tashkent":"Tashkent","sch.filter.samarkand":"Samarkand","sch.filter.bukhara":"Bukhara","sch.filter.fergana":"Fergana","sch.filter.nukus":"Nukus","sch.table.school":"School","sch.table.status":"Status","sch.table.progress":"Progress",
+    "about.eyebrow":"About","about.title":"Why Ecogen","about.subtitle":"A single digital platform for students, teachers and volunteers.",
+    "about.c1":"Real data","about.c1t":"Open-Meteo integration, coordinates of 257+ eco-schools.",
+    "about.c2":"Education","about.c2t":"Lesson materials, eco-calendar, knowledge base.",
+    "about.c3":"Community","about.c3t":"100,000+ volunteers, grants and success stories.",
+    "about.c4":"Accessibility","about.c4t":"High contrast, alt-texts, font scaling.",
+    "foot.desc":"Digital environmental education platform and Eco-Schools Uzbekistan project.",
+    "foot.nav":"Navigation","foot.res":"Resources","foot.contact":"Contacts",
+    "foot.rights":"All rights reserved.","foot.made":"Made with 💚 for a green future","foot.visits":"Visits:",
+    "toast.vol":"✅ Thank you! Your application has been sent.","toast.problem":"📍 Problem point added to the map.","report.btn":"📸 Report a problem","report.title":"Report a problem","report.pickOnMap":"Click on the map","report.photo":"Problem photo (optional)","report.type":"Problem type","report.type.trash":"🗑️ Trash","report.type.water":"💧 Water pollution","report.type.air":"💨 Air pollution","report.type.soil":"🌱 Soil pollution","report.type.other":"⚠️ Other","report.desc":"Description","report.descPlaceholder":"Describe the problem...","report.name":"Your name (optional)","report.submit":"Submit report","report.cancel":"Cancel","report.success":"Report sent!","wind.btn":"💨 Planet breathing"
+  }
+};
+
+let currentLang = 'ru';
+
+function applyLang(lang){
+  currentLang = lang;
+  document.documentElement.lang = lang;
+  document.querySelectorAll('[data-lang]').forEach(function(b){
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    const key = el.dataset.i18n;
+    if(i18n[lang][key]) el.textContent = i18n[lang][key];
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el){
+    const key = el.dataset.i18nHtml;
+    if(i18n[lang][key]) el.innerHTML = i18n[lang][key];
+  });
+  const ph = {
+    ru:{vname:'Альбина Каримова',vmsg:'Опыт, доступное время...'},
+    uz:{vname:'Albina Karimova',vmsg:'Tajriba, mavjud vaqt...'},
+    en:{vname:'Albina Karimova',vmsg:'Experience, available time...'}
+  }[lang];
+  const vn = document.getElementById('vname');
+  const vm = document.getElementById('vmsg');
+  if(vn) vn.placeholder = ph.vname;
+    if(vm) vm.placeholder = ph.vmsg;
+  
+  // Обновить текст кнопок при смене языка
+  const rb = document.getElementById('reportBtn');
+  if(rb && !rb.classList.contains('picking')){
+    rb.textContent = i18n[lang]['report.btn'] || rb.textContent;
+  }
+  const wt = document.getElementById('windToggle');
+  if(wt && !wt.classList.contains('active')){
+    wt.textContent = i18n[lang]['wind.btn'] || wt.textContent;
+  }
+}
+
+document.querySelectorAll('.lang-switch button').forEach(function(btn){
+  btn.addEventListener('click', function(){ applyLang(btn.dataset.lang); });
+});
+
+/* =========================================================
+   2. МОБИЛЬНОЕ МЕНЮ
+   ========================================================= */
+const burger = document.getElementById('burger');
+const navLinks = document.getElementById('navLinks');
+if(burger && navLinks){
+  burger.addEventListener('click', function(){
+    const open = navLinks.classList.toggle('open');
+    burger.setAttribute('aria-expanded', open);
+  });
+  navLinks.querySelectorAll('a').forEach(function(a){
+    a.addEventListener('click', function(){ navLinks.classList.remove('open'); });
+  });
+}
+
+/* =========================================================
+   3. КАРТА LEAFLET — РАСШИРЕННАЯ ВЕРСИЯ
+   ========================================================= */
+const cities = {
+  tashkent:[41.2995,69.2401],samarkand:[39.6270,66.9750],bukhara:[39.7747,64.4286],
+  nukus:[42.4531,59.6103],andijan:[40.7829,72.3442],fergana:[40.3864,71.7864],
+  namangan:[40.9983,71.6726],urgench:[41.5500,60.6333],navoiy:[40.0844,65.3792],
+  qarshi:[38.8667,65.8000],termiz:[37.2242,67.2783],jizzakh:[40.1158,67.8422],
+  gulistan:[40.4897,68.7842],kokand:[40.5286,70.9425],margilan:[40.4711,71.7243]
+};
+
+const map = L.map('map',{scrollWheelZoom:true}).setView([41.8,64.5],6);
+
+L.tileLayer('https://core-sat.maps.yandex.net/tiles?l=sat&v=3.1265.0&x={x}&y={y}&z={z}&scale=1&lang=ru_RU',{
+  maxZoom: 19, attribution: '© Yandex Maps'
+}).addTo(map);
+
+L.tileLayer('https://core-renderer-tiles.maps.yandex.net/tiles?l=skl&v=21.06.07&x={x}&y={y}&z={z}&scale=1&lang=ru_RU',{
+  maxZoom: 19, pane: 'overlayPane'
+}).addTo(map);
+
+function makePin(type){
+  return L.divIcon({
+    className:'',
+    html:'<div class="pin ' + type + '"></div>',
+    iconSize:[26,26], iconAnchor:[13,26], popupAnchor:[0,-26]
+  });
+}
+
+function addMarker(layer, lat, lng, type, popupHtml){
+  L.marker([lat,lng],{icon:makePin(type)}).bindPopup(popupHtml).addTo(layer);
+}
+
+/* --- ЭКО-ШКОЛЫ (30 штук) --- */
+const schoolsLayer = L.layerGroup();
+const schoolNames = [
+  ['Школа №112','tashkent','Gold'],['Школа №201','tashkent','Gold'],
+  ['Школа №48','samarkand','Silver'],['Школа №15','samarkand','Bronze'],
+  ['Школа №7','nukus','Bronze'],['Школа №25','bukhara','Silver'],
+  ['Школа №63','andijan','Bronze'],['Школа №19','fergana','Gold'],
+  ['Школа №88','namangan','Silver'],['Школа №3','urgench','Bronze'],
+  ['Школа №5','navoiy','Silver'],['Школа №12','qarshi','Bronze'],
+  ['Школа №33','termiz','Bronze'],['Школа №21','jizzakh','Silver'],
+  ['Школа №9','gulistan','Bronze'],['Школа №77','kokand','Gold'],
+  ['Школа №41','margilan','Silver'],['Школа №56','tashkent','Bronze'],
+  ['Школа №98','samarkand','Silver'],['Школа №11','bukhara','Gold'],
+  ['Школа №27','nukus','Silver'],['Школа №34','andijan','Silver'],
+  ['Школа №62','fergana','Bronze'],['Школа №18','namangan','Bronze'],
+  ['Школа №8','navoiy','Bronze'],['Школа №44','qarshi','Silver'],
+  ['Школа №16','termiz','Silver'],['Школа №29','jizzakh','Bronze'],
+  ['Школа №71','urgench','Silver'],['Школа №101','tashkent','Gold']
+];
+schoolNames.forEach(function(item){
+  const base = cities[item[1]] || cities.tashkent;
+  const lat = base[0] + (Math.random()-0.5)*0.06;
+  const lng = base[1] + (Math.random()-0.5)*0.06;
+  addMarker(schoolsLayer, lat, lng, 'school',
+    '<h4>🏫 ' + item[0] + '</h4><p>Eco-Schools Uzbekistan</p><p>Статус: <b>' + item[2] + '</b></p><span class="badge">Программа Eco-Schools</span>');
+});
+
+/* --- ПРОБЛЕМНЫЕ ЗОНЫ --- */
+const problemsLayer = L.layerGroup();
+const problems = [
+  [41.311,69.279,'Несанкционированная свалка','Ташкент','Бытовой мусор на пустыре, ~3 м³'],
+  [39.652,66.959,'Загрязнение арыка','Самарканд','Пластик и бытовые отходы в канале'],
+  [42.462,59.605,'Мусор у дороги','Нукус','Строительный мусор вдоль трассы'],
+  [39.766,64.423,'Загрязнение почвы','Бухара','Разлив нефтепродуктов у СТО'],
+  [40.792,72.337,'Свалка у школы','Андижан','Мусор рядом с детской площадкой'],
+  [40.383,71.789,'Загрязнение канала','Фергана','Сточные воды в арык'],
+  [41.547,60.631,'Сжигание мусора','Ургенч','Открытое сжигание отходов'],
+  [40.083,65.379,'Химические отходы','Навои','Разлив у промзоны']
+];
+problems.forEach(function(item){
+  addMarker(problemsLayer, item[0], item[1], 'problem',
+    '<h4>⚠️ ' + item[2] + '</h4><p>📍 ' + item[3] + '</p><p>' + item[4] + '</p><span class="badge" style="background:#FFD6D6;color:#A11C1C">Сообщено волонтёром</span>');
+});
+
+/* --- ПРИЁМ ВТОРСЫРЬЯ (12 пунктов) --- */
+const recycleLayer = L.layerGroup();
+const recyclePoints = [
+  [41.32,69.25,'Пункт «EcoTon»','tashkent','Пластик, бумага, стекло, металл'],
+  [41.28,69.22,'Сбор макулатуры','tashkent','Бумага, картон'],
+  [41.34,69.28,'Эко-пункт «Chilonzor»','tashkent','Батарейки, пластик'],
+  [39.63,66.98,'Эко-пункт «Zamin»','samarkand','Пластик, стекло'],
+  [39.78,64.42,'Приём стеклотары','bukhara','Стекло, алюминий'],
+  [42.45,59.61,'Пункт «Aral Eco»','nukus','Пластик, батарейки'],
+  [40.78,72.34,'Эко-пункт «Andijan»','andijan','Пластик, бумага'],
+  [40.39,71.79,'Приём металлолома','fergana','Металл, жесть'],
+  [40.99,71.67,'Пункт «Namangan Eco»','namangan','Пластик, стекло'],
+  [41.55,60.63,'Приём макулатуры','urgench','Бумага, картон'],
+  [40.08,65.38,'Пункт «Navoiy Green»','navoiy','Пластик, металл'],
+  [38.87,65.80,'Эко-пункт «Qarshi»','qarshi','Стекло, пластик']
+];
+recyclePoints.forEach(function(item){
+  addMarker(recycleLayer, item[0], item[1], 'recycle',
+    '<h4>♻️ ' + item[2] + '</h4><p>📍 ' + item[3] + '</p><p>' + item[4] + '</p><span class="badge" style="background:#D6EEFF;color:#025A94">Приём вторсырья</span>');
+});
+
+/* --- ЗАПОВЕДНИКИ И НАЦИОНАЛЬНЫЕ ПАРКИ --- */
+const natureLayer = L.layerGroup();
+const naturePoints = [
+  [41.2500,70.2000,'Чаткальский биосферный заповедник','Ташкентская обл.','Основан в 1947 г. Площадь 35 000 га. Уникальная горная экосистема Западного Тянь-Шаня.'],
+  [41.5833,68.5000,'Сайхунский заповедник','Сырдарьинская обл.','Создан в 2008 г. Тугайные леса и пойменные экосистемы реки Сырдарья.'],
+  [41.6167,70.0333,'Угам-Чаткальский нац. парк','Ташкентская обл.','Национальный парк с 1990 г. Площадь 574 600 га. Дом снежного барса и тяньшанского медведя.'],
+  [39.8333,67.0833,'Зааминский нац. парк','Джизакская обл.','Создан в 1926 г. Горные арчовые леса и можжевельники, 3000+ видов растений.'],
+  [38.5000,67.5000,'Гиссарский заповедник','Кашкадарьинская обл.','Основан в 1983 г. Площадь 80 986 га. Высокогорные экосистемы Гиссарского хребта.'],
+  [38.0000,67.5000,'Сурханский заповедник','Сурхандарьинская обл.','Создан в 1986 г. Тугайные леса и редкие виды — бухарский олень, джейран.'],
+  [42.0000,62.5000,'Кызылкумский заповедник','Навоийская обл.','Основан в 1971 г. Площадь 10 311 га. Пустынные экосистемы, сайгаки, джейраны.'],
+  [43.5000,58.5000,'Нижне-Амударьинский нац. парк','Каракалпакстан','Тугайные леса Амударьи, фламинго, пеликаны. Охрана водно-болотных угодий.'],
+  [40.5000,70.5000,'Арсланбоб','Граница с Кыргызстаном','Уникальные реликтовые ореховые леса, крупнейшие в мире.'],
+  [41.1000,71.8000,'Нац. парк «Арал-Пайгамбар»','Бухарская обл.','Пустынная фауна: джейран, сайгак, варан. Реинтродукция кулана.']
+];
+naturePoints.forEach(function(item){
+  addMarker(natureLayer, item[0], item[1], 'nature',
+    '<h4>🏞️ ' + item[2] + '</h4><p>📍 ' + item[3] + '</p><p>' + item[4] + '</p><span class="badge" style="background:#D8F3DC;color:#1B4332">Охраняемая территория</span>');
+});
+
+/* --- КРУПНЫЕ ПРЕДПРИЯТИЯ --- */
+const industryLayer = L.layerGroup();
+const industryPoints = [
+  [39.766,64.423,'Бухарский НПЗ','Бухара','Нефтеперерабатывающий завод. Один из крупнейших источников выбросов в регионе.'],
+  [40.084,65.379,'Навоийский ГМК','Навои','Горно-металлургический комбинат. Добыча и переработка золота и урана.'],
+  [41.220,69.220,'Ташкентская ТЭС','Ташкент','Тепловая электростанция. Один из основных источников CO₂ в столице.'],
+  [40.383,71.789,'Ферганский НПЗ','Фергана','Нефтеперерабатывающий завод. Выбросы SO₂ и NOₓ.'],
+  [39.650,66.960,'Самаркандский цемзавод','Самарканд','Цементное производство. Высокие выбросы пыли и CO₂.'],
+  [41.500,60.630,'Ургенчская ТЭС','Ургенч','Тепловая электростанция в Хорезмской области.'],
+  [40.800,72.300,'Андижанский химзавод','Андижан','Химическое производство. Выбросы в атмосферу и воду.'],
+  [42.450,59.600,'Нукусская ТЭС','Нукус','Тепловая электростанция в Каракалпакстане.']
+];
+industryPoints.forEach(function(item){
+  addMarker(industryLayer, item[0], item[1], 'industry',
+    '<h4>🏭 ' + item[2] + '</h4><p>📍 ' + item[3] + '</p><p>' + item[4] + '</p><span class="badge" style="background:#FFE0D6;color:#7A3B0E">Промышленный объект</span>');
+});
+
+/* --- СТАНЦИИ МОНИТОРИНГА ВОЗДУХА --- */
+const stationsLayer = L.layerGroup();
+const stationsPoints = [
+  [41.311,69.279,'Станция №1 (Ташкент)','Ташкент','Центр столицы. Измерения PM2.5, PM10, NO₂, O₃.'],
+  [41.290,69.200,'Станция №2 (Ташкент)','Ташкент','Чиланзарский район. Мониторинг PM и SO₂.'],
+  [39.654,66.959,'Станция «Самарканд»','Самарканд','Регулярные измерения AQI. Данные на Open-Meteo.'],
+  [39.774,64.423,'Станция «Бухара»','Бухара','Мониторинг качества воздуха в историческом центре.'],
+  [42.461,59.610,'Станция «Нукус»','Нукус','Пост наблюдения в Приаралье.'],
+  [40.785,72.344,'Станция «Андижан»','Андижан','Ферганская долина, наблюдение за PM2.5.'],
+  [40.389,71.789,'Станция «Фергана»','Фергана','Пост в промышленной зоне.'],
+  [40.997,71.672,'Станция «Наманган»','Наманган','Регулярный мониторинг AQI.']
+];
+stationsPoints.forEach(function(item){
+  addMarker(stationsLayer, item[0], item[1], 'station',
+    '<h4>📡 ' + item[2] + '</h4><p>📍 ' + item[3] + '</p><p>' + item[4] + '</p><span class="badge" style="background:#E7DCF5;color:#4B2E83">Мониторинг AQI</span>');
+});
+
+/* --- Добавляем слои на карту --- */
+schoolsLayer.addTo(map);
+problemsLayer.addTo(map);
+recycleLayer.addTo(map);
+natureLayer.addTo(map);
+industryLayer.addTo(map);
+stationsLayer.addTo(map);
+
+/* --- Переключатели слоёв --- */
+const layerRefs = {
+  layerSchools: schoolsLayer,
+  layerProblems: problemsLayer,
+  layerRecycle: recycleLayer,
+  layerNature: natureLayer,
+  layerIndustry: industryLayer,
+  layerStations: stationsLayer
+};
+
+Object.keys(layerRefs).forEach(function(id){
+  const el = document.getElementById(id);
+  if(el){
+    el.addEventListener('change', function(e){
+      e.target.checked ? map.addLayer(layerRefs[id]) : map.removeLayer(layerRefs[id]);
+    });
+  }
+});
+/* --- Shift+клик — добавить проблему --- */
+map.on('click', function(e){
+  if(!e.originalEvent.shiftKey) return;
+  const lat = e.latlng.lat, lng = e.latlng.lng;
+  addMarker(problemsLayer, lat, lng, 'problem',
+    '<h4>⚠️ Новая проблема</h4><p>Координаты: ' + lat.toFixed(4) + ', ' + lng.toFixed(4) + '</p><p>Добавлено вами.</p>');
+  showToast(i18n[currentLang]['toast.problem']);
+});
+/* =========================================================
+   ГЛОБАЛЬНЫЙ СЛОЙ AQI (220 городов мира)
+   ========================================================= */
+const GLOBAL_CITIES = [
+  /* ─── СЕВЕРНАЯ АМЕРИКА (35) ─── */
+  {name:'New York', lat:40.7128, lon:-74.0060},
+  {name:'Los Angeles', lat:34.0522, lon:-118.2437},
+  {name:'Chicago', lat:41.8781, lon:-87.6298},
+  {name:'Houston', lat:29.7604, lon:-95.3698},
+  {name:'Phoenix', lat:33.4484, lon:-112.0740},
+  {name:'Philadelphia', lat:39.9526, lon:-75.1652},
+  {name:'San Antonio', lat:29.4241, lon:-98.4936},
+  {name:'San Diego', lat:32.7157, lon:-117.1611},
+  {name:'Dallas', lat:32.7767, lon:-96.7970},
+  {name:'San Jose', lat:37.3382, lon:-121.8863},
+  {name:'Austin', lat:30.2672, lon:-97.7431},
+  {name:'Miami', lat:25.7617, lon:-80.1918},
+  {name:'Boston', lat:42.3601, lon:-71.0589},
+  {name:'Seattle', lat:47.6062, lon:-122.3321},
+  {name:'Denver', lat:39.7392, lon:-104.9903},
+  {name:'Detroit', lat:42.3314, lon:-83.0458},
+  {name:'Portland', lat:45.5152, lon:-122.6784},
+  {name:'Las Vegas', lat:36.1699, lon:-115.1398},
+  {name:'Atlanta', lat:33.7490, lon:-84.3880},
+  {name:'Toronto', lat:43.6532, lon:-79.3832},
+  {name:'Vancouver', lat:49.2827, lon:-123.1207},
+  {name:'Montreal', lat:45.5017, lon:-73.5673},
+  {name:'Calgary', lat:51.0447, lon:-114.0719},
+  {name:'Ottawa', lat:45.4215, lon:-75.6972},
+  {name:'Edmonton', lat:53.5461, lon:-113.4938},
+  {name:'Mexico City', lat:19.4326, lon:-99.1332},
+  {name:'Guadalajara', lat:20.6597, lon:-103.3496},
+  {name:'Monterrey', lat:25.6866, lon:-100.3161},
+  {name:'Tijuana', lat:32.5149, lon:-117.0382},
+  {name:'Havana', lat:23.1136, lon:-82.3666},
+  {name:'Santo Domingo', lat:18.4861, lon:-69.9312},
+  {name:'San Juan', lat:18.4655, lon:-66.1057},
+  {name:'Panama City', lat:8.9824, lon:-79.5199},
+  {name:'San José', lat:9.9281, lon:-84.0907},
+  {name:'Guatemala City', lat:14.6349, lon:-90.5069},
+
+  /* ─── ЮЖНАЯ АМЕРИКА (20) ─── */
+  {name:'São Paulo', lat:-23.5505, lon:-46.6333},
+  {name:'Rio de Janeiro', lat:-22.9068, lon:-43.1729},
+  {name:'Brasília', lat:-15.7939, lon:-47.8828},
+  {name:'Salvador', lat:-12.9777, lon:-38.5016},
+  {name:'Fortaleza', lat:-3.7319, lon:-38.5267},
+  {name:'Belo Horizonte', lat:-19.9167, lon:-43.9345},
+  {name:'Manaus', lat:-3.1190, lon:-60.0217},
+  {name:'Buenos Aires', lat:-34.6037, lon:-58.3816},
+  {name:'Córdoba', lat:-31.4201, lon:-64.1888},
+  {name:'Lima', lat:-12.0464, lon:-77.0428},
+  {name:'Bogotá', lat:4.7110, lon:-74.0721},
+  {name:'Medellín', lat:6.2442, lon:-75.5812},
+  {name:'Cali', lat:3.4516, lon:-76.5320},
+  {name:'Quito', lat:-0.1807, lon:-78.4678},
+  {name:'Guayaquil', lat:-2.1894, lon:-79.8891},
+  {name:'Santiago', lat:-33.4489, lon:-70.6693},
+  {name:'Caracas', lat:10.4806, lon:-66.9036},
+  {name:'Montevideo', lat:-34.9011, lon:-56.1645},
+  {name:'Asunción', lat:-25.2637, lon:-57.5759},
+  {name:'La Paz', lat:-16.4897, lon:-68.1193},
+
+  /* ─── ЕВРОПА (60) ─── */
+  {name:'London', lat:51.5074, lon:-0.1278},
+  {name:'Manchester', lat:53.4808, lon:-2.2426},
+  {name:'Birmingham', lat:52.4862, lon:-1.8904},
+  {name:'Glasgow', lat:55.8642, lon:-4.2518},
+  {name:'Dublin', lat:53.3498, lon:-6.2603},
+  {name:'Paris', lat:48.8566, lon:2.3522},
+  {name:'Lyon', lat:45.7640, lon:4.8357},
+  {name:'Marseille', lat:43.2965, lon:5.3698},
+  {name:'Berlin', lat:52.5200, lon:13.4050},
+  {name:'Hamburg', lat:53.5511, lon:9.9937},
+  {name:'Munich', lat:48.1351, lon:11.5820},
+  {name:'Frankfurt', lat:50.1109, lon:8.6821},
+  {name:'Stuttgart', lat:48.7758, lon:9.1829},
+  {name:'Cologne', lat:50.9375, lon:6.9603},
+  {name:'Madrid', lat:40.4168, lon:-3.7038},
+  {name:'Barcelona', lat:41.3851, lon:2.1734},
+  {name:'Valencia', lat:39.4699, lon:-0.3763},
+  {name:'Seville', lat:37.3891, lon:-5.9845},
+  {name:'Lisbon', lat:38.7223, lon:-9.1393},
+  {name:'Porto', lat:41.1579, lon:-8.6291},
+  {name:'Rome', lat:41.9028, lon:12.4964},
+  {name:'Milan', lat:45.4642, lon:9.1900},
+  {name:'Naples', lat:40.8518, lon:14.2681},
+  {name:'Turin', lat:45.0703, lon:7.6869},
+  {name:'Athens', lat:37.9838, lon:23.7275},
+  {name:'Vienna', lat:48.2082, lon:16.3738},
+  {name:'Prague', lat:50.0755, lon:14.4378},
+  {name:'Budapest', lat:47.4979, lon:19.0402},
+  {name:'Warsaw', lat:52.2297, lon:21.0122},
+  {name:'Krakow', lat:50.0647, lon:19.9450},
+  {name:'Gdansk', lat:54.3520, lon:18.6466},
+  {name:'Bucharest', lat:44.4268, lon:26.1025},
+  {name:'Sofia', lat:42.6977, lon:23.3219},
+  {name:'Belgrade', lat:44.7866, lon:20.4489},
+  {name:'Zagreb', lat:45.8150, lon:15.9819},
+  {name:'Ljubljana', lat:46.0569, lon:14.5058},
+  {name:'Bratislava', lat:48.1486, lon:17.1077},
+  {name:'Riga', lat:56.9496, lon:24.1052},
+  {name:'Vilnius', lat:54.6872, lon:25.2797},
+  {name:'Tallinn', lat:59.4370, lon:24.7536},
+  {name:'Helsinki', lat:60.1699, lon:24.9384},
+  {name:'Stockholm', lat:59.3293, lon:18.0686},
+  {name:'Oslo', lat:59.9139, lon:10.7522},
+  {name:'Copenhagen', lat:55.6761, lon:12.5683},
+  {name:'Amsterdam', lat:52.3676, lon:4.9041},
+  {name:'Brussels', lat:50.8503, lon:4.3517},
+  {name:'Zurich', lat:47.3769, lon:8.5417},
+  {name:'Geneva', lat:46.2044, lon:6.1432},
+  {name:'Moscow', lat:55.7558, lon:37.6173},
+  {name:'Saint Petersburg', lat:59.9311, lon:30.3609},
+  {name:'Kyiv', lat:50.4501, lon:30.5234},
+  {name:'Lviv', lat:49.8397, lon:24.0297},
+  {name:'Minsk', lat:53.9006, lon:27.5590},
+  {name:'Chisinau', lat:47.0105, lon:28.8638},
+  {name:'Tbilisi', lat:41.7151, lon:44.8271},
+  {name:'Yerevan', lat:40.1792, lon:44.4991},
+  {name:'Baku', lat:40.4093, lon:49.8671},
+  {name:'Istanbul', lat:41.0082, lon:28.9784},
+  {name:'Ankara', lat:39.9334, lon:32.8597},
+  {name:'Belgrade', lat:44.7866, lon:20.4489},
+
+  /* ─── РОССИЯ И СНГ (20) ─── */
+  {name:'Novosibirsk', lat:55.0084, lon:82.9357},
+  {name:'Yekaterinburg', lat:56.8389, lon:60.6057},
+  {name:'Kazan', lat:55.8304, lon:49.0661},
+  {name:'Samara', lat:53.2001, lon:50.1500},
+  {name:'Omsk', lat:54.9885, lon:73.3242},
+  {name:'Chelyabinsk', lat:55.1644, lon:61.4368},
+  {name:'Rostov-on-Don', lat:47.2225, lon:39.7189},
+  {name:'Ufa', lat:54.7388, lon:55.9721},
+  {name:'Krasnoyarsk', lat:56.0153, lon:92.8932},
+  {name:'Voronezh', lat:51.6720, lon:39.1843},
+  {name:'Perm', lat:58.0105, lon:56.2502},
+  {name:'Volgograd', lat:48.7080, lon:44.5133},
+  {name:'Almaty', lat:43.2220, lon:76.8512},
+  {name:'Astana', lat:51.1694, lon:71.4491},
+  {name:'Shymkent', lat:42.3000, lon:69.5900},
+  {name:'Tashkent', lat:41.2995, lon:69.2401},
+  {name:'Samarkand', lat:39.6270, lon:66.9750},
+  {name:'Bukhara', lat:39.7747, lon:64.4286},
+  {name:'Bishkek', lat:42.8746, lon:74.5698},
+  {name:'Dushanbe', lat:38.5598, lon:68.7870},
+  {name:'Ashgabat', lat:37.9601, lon:58.3261},
+
+  /* ─── АЗИЯ (55) ─── */
+  {name:'Tokyo', lat:35.6762, lon:139.6503},
+  {name:'Osaka', lat:34.6937, lon:135.5023},
+  {name:'Nagoya', lat:35.1815, lon:136.9066},
+  {name:'Sapporo', lat:43.0618, lon:141.3545},
+  {name:'Seoul', lat:37.5665, lon:126.9780},
+  {name:'Busan', lat:35.1796, lon:129.0756},
+  {name:'Beijing', lat:39.9042, lon:116.4074},
+  {name:'Shanghai', lat:31.2304, lon:121.4737},
+  {name:'Guangzhou', lat:23.1291, lon:113.2644},
+  {name:'Shenzhen', lat:22.5431, lon:114.0579},
+  {name:'Chengdu', lat:30.5728, lon:104.0668},
+  {name:'Wuhan', lat:30.5928, lon:114.3055},
+  {name:'Xi\'an', lat:34.3416, lon:108.9398},
+  {name:'Hangzhou', lat:30.2741, lon:120.1551},
+  {name:'Chongqing', lat:29.5630, lon:106.5516},
+  {name:'Tianjin', lat:39.3434, lon:117.3616},
+  {name:'Hong Kong', lat:22.3193, lon:114.1694},
+  {name:'Taipei', lat:25.0330, lon:121.5654},
+  {name:'Delhi', lat:28.6139, lon:77.2090},
+  {name:'Mumbai', lat:19.0760, lon:72.8777},
+  {name:'Kolkata', lat:22.5726, lon:88.3639},
+  {name:'Bangalore', lat:12.9716, lon:77.5946},
+  {name:'Chennai', lat:13.0827, lon:80.2707},
+  {name:'Hyderabad', lat:17.3850, lon:78.4867},
+  {name:'Pune', lat:18.5204, lon:73.8567},
+  {name:'Ahmedabad', lat:23.0225, lon:72.5714},
+  {name:'Jaipur', lat:26.9124, lon:75.7873},
+  {name:'Lucknow', lat:26.8467, lon:80.9462},
+  {name:'Surat', lat:21.1702, lon:72.8311},
+  {name:'Karachi', lat:24.8607, lon:67.0011},
+  {name:'Lahore', lat:31.5204, lon:74.3587},
+  {name:'Islamabad', lat:33.6844, lon:73.0479},
+  {name:'Dhaka', lat:23.8103, lon:90.4125},
+  {name:'Chittagong', lat:22.3569, lon:91.7832},
+  {name:'Kathmandu', lat:27.7172, lon:85.3240},
+  {name:'Colombo', lat:6.9271, lon:79.8612},
+  {name:'Bangkok', lat:13.7563, lon:100.5018},
+  {name:'Singapore', lat:1.3521, lon:103.8198},
+  {name:'Jakarta', lat:-6.2088, lon:106.8456},
+  {name:'Surabaya', lat:-7.2575, lon:112.7521},
+  {name:'Manila', lat:14.5995, lon:120.9842},
+  {name:'Hanoi', lat:21.0285, lon:105.8542},
+  {name:'Ho Chi Minh', lat:10.8231, lon:106.6297},
+  {name:'Kuala Lumpur', lat:3.1390, lon:101.6869},
+  {name:'Yangon', lat:16.8661, lon:96.1951},
+  {name:'Phnom Penh', lat:11.5564, lon:104.9282},
+  {name:'Dubai', lat:25.2048, lon:55.2708},
+  {name:'Abu Dhabi', lat:24.4539, lon:54.3773},
+  {name:'Riyadh', lat:24.7136, lon:46.6753},
+  {name:'Jeddah', lat:21.4858, lon:39.1925},
+  {name:'Kuwait City', lat:29.3759, lon:47.9774},
+  {name:'Doha', lat:25.2854, lon:51.5310},
+  {name:'Tehran', lat:35.6892, lon:51.3890},
+  {name:'Baghdad', lat:33.3152, lon:44.3661},
+  {name:'Tel Aviv', lat:32.0853, lon:34.7818},
+
+  /* ─── АФРИКА (20) ─── */
+  {name:'Cairo', lat:30.0444, lon:31.2357},
+  {name:'Alexandria', lat:31.2001, lon:29.9187},
+  {name:'Casablanca', lat:33.5731, lon:-7.5898},
+  {name:'Rabat', lat:34.0209, lon:-6.8416},
+  {name:'Algiers', lat:36.7538, lon:3.0588},
+  {name:'Tunis', lat:36.8065, lon:10.1815},
+  {name:'Tripoli', lat:32.8872, lon:13.1913},
+  {name:'Lagos', lat:6.5244, lon:3.3792},
+  {name:'Abuja', lat:9.0765, lon:7.3986},
+  {name:'Accra', lat:5.6037, lon:-0.1870},
+  {name:'Abidjan', lat:5.3599, lon:-4.0083},
+  {name:'Dakar', lat:14.7167, lon:-17.4677},
+  {name:'Kinshasa', lat:-4.4419, lon:15.2663},
+  {name:'Luanda', lat:-8.8390, lon:13.2894},
+  {name:'Addis Ababa', lat:9.0320, lon:38.7469},
+  {name:'Nairobi', lat:-1.2921, lon:36.8219},
+  {name:'Dar es Salaam', lat:-6.7924, lon:39.2083},
+  {name:'Kampala', lat:0.3476, lon:32.5825},
+  {name:'Johannesburg', lat:-26.2041, lon:28.0473},
+  {name:'Cape Town', lat:-33.9249, lon:18.4241},
+  {name:'Durban', lat:-29.8587, lon:31.0218},
+
+  /* ─── ОКЕАНИЯ (8) ─── */
+  {name:'Sydney', lat:-33.8688, lon:151.2093},
+  {name:'Melbourne', lat:-37.8136, lon:144.9631},
+  {name:'Brisbane', lat:-27.4698, lon:153.0251},
+  {name:'Perth', lat:-31.9505, lon:115.8605},
+  {name:'Adelaide', lat:-34.9285, lon:138.6007},
+  {name:'Auckland', lat:-36.8485, lon:174.7633},
+  {name:'Wellington', lat:-41.2865, lon:174.7762},
+  {name:'Christchurch', lat:-43.5321, lon:172.6362}
+];const globalAqiLayer = L.layerGroup();
+
+/* =========================================================
+   ОТРИСОВКА SVG-ГРАФИКА ПРОГНОЗА
+   ========================================================= */
+function renderForecastChart(data){
+  const width = 280;
+  const height = 120;
+  const padding = { top: 20, right: 20, bottom: 30, left: 35 };
+  
+  const chartW = width - padding.left - padding.right;
+  const chartH = height - padding.top - padding.bottom;
+  
+  const values = data.map(function(d){ return d.aqi; });
+  const maxAqi = Math.max(...values, 60);
+  const minAqi = Math.min(...values, 0);
+  
+  const points = data.map(function(d, i){
+    const x = padding.left + (i / (data.length - 1)) * chartW;
+    const y = padding.top + chartH - ((d.aqi - minAqi) / (maxAqi - minAqi)) * chartH;
+    return { x: x, y: y, aqi: d.aqi, date: d.date };
+  });
+  
+  let svg = '<svg width="' + width + '" height="' + height + '" viewBox="0 0 ' + width + ' ' + height + '" class="forecast-svg">';
+  
+  svg += '<rect x="' + padding.left + '" y="' + padding.top + '" width="' + chartW + '" height="' + chartH + '" fill="#f8f9fa" rx="4"/>';
+  
+  let pathD = 'M ' + points[0].x + ' ' + points[0].y;
+  for(let i = 1; i < points.length; i++){
+    pathD += ' L ' + points[i].x + ' ' + points[i].y;
+  }
+  svg += '<path d="' + pathD + '" fill="none" stroke="#40916C" stroke-width="2.5" stroke-linecap="round"/>';
+  
+  points.forEach(function(p){
+    const color = getGlobalAQIColor(p.aqi);
+    svg += '<circle cx="' + p.x + '" cy="' + p.y + '" r="4" fill="' + color + '" stroke="#fff" stroke-width="2"/>';
+    
+    const day = p.date.split('-')[2];
+    const month = p.date.split('-')[1];
+    svg += '<text x="' + p.x + '" y="' + (height - 8) + '" text-anchor="middle" font-size="10" fill="#6c757d">' + day + '.' + month + '</text>';
+  });
+  
+  svg += '<text x="' + (padding.left - 5) + '" y="' + (padding.top + 4) + '" text-anchor="end" font-size="9" fill="#6c757d">' + maxAqi + '</text>';
+  svg += '<text x="' + (padding.left - 5) + '" y="' + (padding.top + chartH + 4) + '" text-anchor="end" font-size="9" fill="#6c757d">' + minAqi + '</text>';
+  
+  svg += '</svg>';
+  return svg;
+}
+
+function getGlobalAQIColor(aqi){
+  if(aqi <= 20)  return '#50F0E6';
+  if(aqi <= 40)  return '#50CCAA';
+  if(aqi <= 60)  return '#F0E641';
+  if(aqi <= 80)  return '#FF5050';
+  if(aqi <= 100) return '#960032';
+  return '#7D2181';
+}
+
+async function loadGlobalAQI(){
+  if(globalAqiLayer.getLayers().length > 0) return;
+  
+  const BATCH_SIZE = 30;
+  const total = GLOBAL_CITIES.length;
+  
+  for(let start = 0; start < total; start += BATCH_SIZE){
+    const batch = GLOBAL_CITIES.slice(start, start + BATCH_SIZE);
+    const lats = batch.map(function(c){ return c.lat; }).join(',');
+    const lons = batch.map(function(c){ return c.lon; }).join(',');
+    const url = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=' + lats + '&longitude=' + lons + '&current=european_aqi';
+    
+    try {
+      const res = await fetch(url);
+      const data = await res.json();
+      const results = Array.isArray(data) ? data : [data];
+      
+      results.forEach(function(item, i){
+        const city = batch[i];
+        if(!city) return;
+        const aqi = item.current && item.current.european_aqi;
+        if(aqi === undefined || aqi === null) return;
+        
+        const color = getGlobalAQIColor(aqi);
+                const marker = L.circleMarker([city.lat, city.lon], {
+          radius: 7,
+          fillColor: color,
+          color: '#ffffff',
+          weight: 2,
+          opacity: 1,
+          fillOpacity: 0.9
+        })
+        .bindPopup('<h4>🌍 ' + city.name + '</h4><p>AQI: <b>' + Math.round(aqi) + '</b></p><div class="forecast-loading">Загрузка прогноза...</div>')
+        .addTo(globalAqiLayer);
+
+                marker.on('click', async function(){
+          const popup = marker.getPopup();
+          
+          // Показываем загрузку
+          popup.setContent(
+            '<h4>🌍 ' + city.name + '</h4>' +
+            '<div class="forecast-loading">Загрузка данных...</div>'
+          );
+          
+          // Грузим детали + прогноз параллельно
+          const [details, forecast] = await Promise.all([
+            fetchCityDetails(city),
+            fetchAQIForecast(city)
+          ]);
+          
+          let html = '<h4>🌍 ' + city.name + '</h4>';
+          
+          if(details){
+            html += '<div class="aqi-details">';
+            html += '<div class="aqi-details-row"><span>AQI (общий)</span><span class="aqi-val ' + getAQIColorClass(details.aqi) + '">' + Math.round(details.aqi) + '</span></div>';
+            
+            if(details.pm25 != null){
+              const pm25 = getPM25Level(details.pm25);
+              html += '<div class="aqi-details-row"><span>PM2.5 <small>мкг/м³</small></span><span class="aqi-val ' + pm25.label + '">' + details.pm25.toFixed(1) + '</span></div>';
+            }
+            if(details.pm10 != null){
+              html += '<div class="aqi-details-row"><span>PM10 <small>мкг/м³</small></span><span class="aqi-val ' + getPM10Level(details.pm10) + '">' + details.pm10.toFixed(1) + '</span></div>';
+            }
+            if(details.no2 != null){
+              html += '<div class="aqi-details-row"><span>NO₂ <small>мкг/м³</small></span><span class="aqi-val ' + getNO2Level(details.no2) + '">' + details.no2.toFixed(1) + '</span></div>';
+            }
+            if(details.o3 != null){
+              html += '<div class="aqi-details-row"><span>O₃ <small>мкг/м³</small></span><span class="aqi-val ' + getO3Level(details.o3) + '">' + details.o3.toFixed(1) + '</span></div>';
+            }
+            if(details.so2 != null){
+              html += '<div class="aqi-details-row"><span>SO₂ <small>мкг/м³</small></span><span class="aqi-val ' + getSO2Level(details.so2) + '">' + details.so2.toFixed(1) + '</span></div>';
+            }
+            if(details.co != null){
+              html += '<div class="aqi-details-row"><span>CO <small>мкг/м³</small></span><span class="aqi-val ' + getCOLevel(details.co) + '">' + Math.round(details.co) + '</span></div>';
+            }
+            html += '</div>';
+          }
+          
+          if(forecast && forecast.length > 0){
+            html += '<div class="forecast-chart">' + renderForecastChart(forecast) + '</div>';
+          }
+          
+          popup.setContent(html);
+        });
+      });
+    } catch(e) {
+      console.error('Global AQI error:', e);
+    }
+  }
+}
+const layerGlobalAqiEl = document.getElementById('layerGlobalAqi');
+if(layerGlobalAqiEl){
+  layerGlobalAqiEl.addEventListener('change', async function(e){
+    if(e.target.checked){
+      map.addLayer(globalAqiLayer);
+      await loadGlobalAQI();
+    } else {
+      map.removeLayer(globalAqiLayer);
+    }
+  });
+}
+/* =========================================================
+   4. КАЛЬКУЛЯТОР CO2
+   ========================================================= */
+const FACTORS = { elec:0.45, gas:2.0, fuel:2.31, water:0.30, waste:0.50 };
+
+function calcFootprint(){
+  const elec = +document.getElementById('cElec').value || 0;
+  const gas = +document.getElementById('cGas').value || 0;
+  const fuel = +document.getElementById('cFuel').value || 0;
+  const water = +document.getElementById('cWater').value || 0;
+  const waste = +document.getElementById('cWaste').value || 0;
+
+  const kgElec = elec * FACTORS.elec;
+  const kgGas = gas * FACTORS.gas;
+  const kgFuel = fuel * FACTORS.fuel;
+  const kgWater = water * FACTORS.water;
+  const kgWaste = waste * FACTORS.waste;
+
+  const totalMonth = kgElec + kgGas + kgFuel + kgWater + kgWaste;
+  const totalYear = totalMonth * 12 / 1000;
+
+  document.getElementById('resTotal').textContent = totalYear.toFixed(2);
+  document.getElementById('valElec').textContent = Math.round(kgElec) + ' кг';
+  document.getElementById('valGas').textContent = Math.round(kgGas) + ' кг';
+  document.getElementById('valFuel').textContent = Math.round(kgFuel) + ' кг';
+  document.getElementById('valWater').textContent = Math.round(kgWater) + ' кг';
+  document.getElementById('valWaste').textContent = Math.round(kgWaste) + ' кг';
+
+  const max = Math.max(kgElec,kgGas,kgFuel,kgWater,kgWaste,1);
+  document.getElementById('barElec').style.width = (kgElec/max*100) + '%';
+  document.getElementById('barGas').style.width  = (kgGas/max*100) + '%';
+  document.getElementById('barFuel').style.width = (kgFuel/max*100) + '%';
+  document.getElementById('barWater').style.width= (kgWater/max*100) + '%';
+  document.getElementById('barWaste').style.width= (kgWaste/max*100) + '%';
+
+  const trees = Math.ceil(totalMonth*12 / 21);
+  const cmp = {
+    ru:'Средний житель Узбекистана — около <b>2.5 т CO₂/год</b>. Мировой средний — <b>4.7 т</b>.<br><br>🌳 Чтобы компенсировать, нужно посадить <b>' + trees + ' деревьев</b>.',
+    uz:'O\'zbekiston fuqarosi — <b>2.5 t CO₂/yil</b>. Jahon — <b>4.7 t</b>.<br><br>🌳 Izingizni qoplash uchun <b>' + trees + ' daraxt</b> ekish kerak.',
+    en:'Average Uzbek — <b>2.5 t CO₂/year</b>. World average — <b>4.7 t</b>.<br><br>🌳 To offset, plant about <b>' + trees + ' trees</b>.'
+  };
+  document.getElementById('resCompare').innerHTML = cmp[currentLang];
+}
+
+const calcFormEl = document.getElementById('calcForm');
+if(calcFormEl) calcFormEl.addEventListener('submit', function(e){
+  e.preventDefault();
+  calcFootprint();
+});
+
+/* =========================================================
+   5. ФОРМА ВОЛОНТЁРА
+   ========================================================= */
+const volFormEl = document.getElementById('volForm');
+if(volFormEl) volFormEl.addEventListener('submit', function(e){
+  e.preventDefault();
+  const name = document.getElementById('vname').value.trim();
+  const city = document.getElementById('vcity').value;
+  const phone = document.getElementById('vphone').value.trim();
+  if(!name || !city || !phone){
+    showToast('⚠️ ' + (currentLang==='ru'?'Заполните обязательные поля':currentLang==='uz'?'Majburiy maydonlarni to\'ldiring':'Fill in required fields'));
+    return;
+  }
+  showToast(i18n[currentLang]['toast.vol']);
+  e.target.reset();
+});
+
+/* =========================================================
+   6. TOAST
+   ========================================================= */
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  if(!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 4000);
+}
+
+/* =========================================================
+   7. PROGRESS BARS
+   ========================================================= */
+const progressObserver = new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if(entry.isIntersecting){
+      const fill = entry.target;
+      const target = fill.style.width;
+      fill.style.width = '0%';
+      requestAnimationFrame(function(){ fill.style.width = target; });
+      progressObserver.unobserve(fill);
+    }
+  });
+},{threshold:0.4});
+document.querySelectorAll('.progress-fill').forEach(function(el){ progressObserver.observe(el); });
+
+/* =========================================================
+   8. КНОПКА "НАВЕРХ"
+   ========================================================= */
+const toTop = document.getElementById('toTop');
+if(toTop){
+  window.addEventListener('scroll', function(){
+    toTop.classList.toggle('show', window.scrollY > 500);
+  });
+  toTop.addEventListener('click', function(){
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+}
+
+/* =========================================================
+   9. АНИМАЦИЯ ПОЯВЛЕНИЯ
+   ========================================================= */
+const fadeObserver = new IntersectionObserver(function(entries){
+  entries.forEach(function(entry){
+    if(entry.isIntersecting){
+      entry.target.classList.add('visible');
+      fadeObserver.unobserve(entry.target);
+    }
+  });
+},{threshold:0.12});
+document.querySelectorAll('.section, .card, .post, .cal-card, .school-card, .event, .about-card').forEach(function(el){
+  el.classList.add('fade-in');
+  fadeObserver.observe(el);
+});
+
+/* =========================================================
+   10. AQI ЧЕРЕЗ OPEN-METEO
+   ========================================================= */
+const AQI_CITIES = {
+  tashkent:  { lat: 41.2995, lon: 69.2401 },
+  samarkand: { lat: 39.6270, lon: 66.9750 },
+  bukhara:   { lat: 39.7747, lon: 64.4286 },
+  nukus:     { lat: 42.4531, lon: 59.6103 },
+  andijan:   { lat: 40.7829, lon: 72.3442 }
+};
+
+function getAQIColorClass(aqi){
+  if(aqi <= 40)  return 'aqi-good';
+  if(aqi <= 60)  return 'aqi-mod';
+  if(aqi <= 80)  return 'aqi-bad';
+  if(aqi <= 100) return 'aqi-very-bad';
+  return 'aqi-hazardous';
+}
+
+async function fetchAQI(city){
+  try{
+    const url = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=' + city.lat + '&longitude=' + city.lon + '&current=european_aqi';
+    const res = await fetch(url);
+    const data = await res.json();
+    if(data.current && data.current.european_aqi !== undefined){
+      return data.current.european_aqi;
+    }
+    return null;
+  }catch(e){
+    console.error('AQI error:', e);
+    return null;
+  }
+}
+/* =========================================================
+   ПРОГНОЗ AQI НА 5 ДНЕЙ (СРЕДНЕЕ ЗА ДЕНЬ)
+   ========================================================= */
+/* =========================================================
+   ДЕТАЛЬНЫЕ ДАННЫЕ О ВОЗДУХЕ (PM2.5, PM10, NO2, O3, SO2, CO)
+   ========================================================= */
+async function fetchCityDetails(city){
+  try {
+    const url = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=' + city.lat + '&longitude=' + city.lon + '&current=pm2_5,pm10,nitrogen_dioxide,ozone,sulphur_dioxide,carbon_monoxide,european_aqi';
+    const res = await fetch(url);
+    const data = await res.json();
+    
+    if(!data.current) return null;
+    
+    return {
+      aqi: data.current.european_aqi,
+      pm25: data.current.pm2_5,
+      pm10: data.current.pm10,
+      no2: data.current.nitrogen_dioxide,
+      o3: data.current.ozone,
+      so2: data.current.sulphur_dioxide,
+      co: data.current.carbon_monoxide
+    };
+  } catch(e) {
+    console.error('Details error:', e);
+    return null;
+  }
+}
+
+/* Оценка PM2.5 по стандарту ВОЗ */
+function getPM25Level(val){
+  if(val <= 15)  return {label:'aqi-good', text:'Хорошо'};
+  if(val <= 35)  return {label:'aqi-mod', text:'Умеренно'};
+  if(val <= 55)  return {label:'aqi-bad', text:'Вредно'};
+  return {label:'aqi-very-bad', text:'Опасно'};
+}
+function getPM10Level(val){
+  if(val <= 45)  return 'aqi-good';
+  if(val <= 100) return 'aqi-mod';
+  if(val <= 150) return 'aqi-bad';
+  return 'aqi-very-bad';
+}
+function getNO2Level(val){
+  if(val <= 40)  return 'aqi-good';
+  if(val <= 100) return 'aqi-mod';
+  if(val <= 200) return 'aqi-bad';
+  return 'aqi-very-bad';
+}
+function getO3Level(val){
+  if(val <= 100) return 'aqi-good';
+  if(val <= 160) return 'aqi-mod';
+  if(val <= 240) return 'aqi-bad';
+  return 'aqi-very-bad';
+}
+function getSO2Level(val){
+  if(val <= 40)  return 'aqi-good';
+  if(val <= 80)  return 'aqi-mod';
+  if(val <= 380) return 'aqi-bad';
+  return 'aqi-very-bad';
+}
+function getCOLevel(val){
+  if(val <= 4000)  return 'aqi-good';
+  if(val <= 10000) return 'aqi-mod';
+  if(val <= 20000) return 'aqi-bad';
+  return 'aqi-very-bad';
+}
+   async function fetchAQIForecast(city){
+  try {
+    const url = 'https://air-quality-api.open-meteo.com/v1/air-quality?latitude=' + city.lat + '&longitude=' + city.lon + '&hourly=european_aqi&timezone=auto&forecast_days=5';
+    const res = await fetch(url);
+    const data = await res.json();
+    
+    if(!data.hourly || !data.hourly.time) return null;
+    
+    const dailyData = {};
+    
+    for(let i = 0; i < data.hourly.time.length; i++){
+      const dateTime = data.hourly.time[i];
+      const date = dateTime.split('T')[0];
+      const aqi = data.hourly.european_aqi[i];
+      
+      if(aqi === null || aqi === undefined) continue;
+      
+      if(!dailyData[date]){
+        dailyData[date] = { sum: 0, count: 0 };
+      }
+      dailyData[date].sum += aqi;
+      dailyData[date].count++;
+    }
+    
+    const result = [];
+    const dates = Object.keys(dailyData).sort();
+    
+    for(const date of dates){
+      const avg = dailyData[date].sum / dailyData[date].count;
+      result.push({ date: date, aqi: Math.round(avg) });
+    }
+    
+    return result;
+  } catch(e) {
+    console.error('Forecast error:', e);
+    return null;
+  }
+}
+async function updateAQIPanel(){
+  const cityKeys = Object.keys(AQI_CITIES);
+  for(let i = 0; i < cityKeys.length; i++){
+    const cityName = cityKeys[i];
+    const coords = AQI_CITIES[cityName];
+    const citySpan = document.querySelector('[data-city="' + cityName + '"]');
+    if(!citySpan) continue;
+    const valueSpan = citySpan.parentElement.querySelector('.aqi-val');
+    if(!valueSpan) continue;
+    const aqi = await fetchAQI(coords);
+    if(aqi === null){
+      valueSpan.textContent = '—';
+      valueSpan.className = 'aqi-val';
+    } else {
+      valueSpan.textContent = Math.round(aqi);
+      valueSpan.className = 'aqi-val ' + getAQIColorClass(aqi);
+    }
+  }
+}
+
+/* =========================================================
+   ЗАПУСК
+   ========================================================= */
+applyLang('ru');
+/* =========================================================
+   ДАННЫЕ РЕЙТИНГА ШКОЛ
+   ========================================================= */
+const SCHOOLS_DATA = [
+  {name:'Школа №112', city:'Ташкент', region:'tashkent', progress:92, status:'flag'},
+  {name:'Школа №201', city:'Ташкент', region:'tashkent', progress:88, status:'gold'},
+  {name:'Школа №19', city:'Фергана', region:'fergana', progress:85, status:'gold'},
+  {name:'Школа №56', city:'Ташкент', region:'tashkent', progress:81, status:'gold'},
+  {name:'Школа №77', city:'Коканд', region:'fergana', progress:79, status:'gold'},
+  {name:'Школа №48', city:'Самарканд', region:'samarkand', progress:74, status:'silver'},
+  {name:'Школа №25', city:'Бухара', region:'bukhara', progress:72, status:'silver'},
+  {name:'Школа №5', city:'Навои', region:'navoiy', progress:70, status:'silver'},
+  {name:'Школа №98', city:'Самарканд', region:'samarkand', progress:68, status:'silver'},
+  {name:'Школа №88', city:'Наманган', region:'namangan', progress:65, status:'silver'},
+  {name:'Школа №71', city:'Ургенч', region:'urgench', progress:62, status:'bronze'},
+  {name:'Школа №21', city:'Джизак', region:'jizzakh', progress:62, status:'bronze'},
+  {name:'Школа №11', city:'Бухара', region:'bukhara', progress:60, status:'bronze'},
+  {name:'Школа №44', city:'Карши', region:'qarshi', progress:60, status:'bronze'},
+  {name:'Школа №62', city:'Фергана', region:'fergana', progress:58, status:'bronze'},
+  {name:'Школа №41', city:'Маргилан', region:'fergana', progress:58, status:'bronze'},
+  {name:'Школа №15', city:'Самарканд', region:'samarkand', progress:56, status:'bronze'},
+  {name:'Школа №7', city:'Нукус', region:'nukus', progress:56, status:'bronze'},
+  {name:'Школа №16', city:'Термез', region:'termiz', progress:56, status:'bronze'},
+  {name:'Школа №8', city:'Навои', region:'navoiy', progress:55, status:'bronze'},
+  {name:'Школа №63', city:'Андижан', region:'andijan', progress:52, status:'bronze'},
+  {name:'Школа №12', city:'Карши', region:'qarshi', progress:52, status:'bronze'},
+  {name:'Школа №29', city:'Джизак', region:'jizzakh', progress:52, status:'bronze'},
+  {name:'Школа №18', city:'Наманган', region:'namangan', progress:50, status:'bronze'},
+  {name:'Школа №27', city:'Нукус', region:'nukus', progress:48, status:'bronze'},
+  {name:'Школа №33', city:'Термез', region:'termiz', progress:48, status:'bronze'},
+  {name:'Школа №3', city:'Ургенч', region:'urgench', progress:48, status:'bronze'},
+  {name:'Школа №34', city:'Андижан', region:'andijan', progress:45, status:'bronze'},
+  {name:'Школа №9', city:'Гулистан', region:'gulistan', progress:45, status:'bronze'}
+];
+
+const STATUS_LABELS = {
+  flag:   {icon:'🏆', text:'Green Flag'},
+  gold:   {icon:'🥇', text:'Gold'},
+  silver: {icon:'🥈', text:'Silver'},
+  bronze: {icon:'🥉', text:'Bronze'}
+};
+function renderSchoolsRating(filter){
+  const container = document.getElementById('schoolsRating');
+  if(!container) return;
+  
+  let schools = SCHOOLS_DATA;
+  if(filter && filter !== 'all'){
+    schools = schools.filter(function(s){ return s.region === filter; });
+  }
+  
+  schools = schools.slice().sort(function(a, b){ return b.progress - a.progress; });
+  
+  let html = '<div class="rating-header">';
+  html += '<div style="text-align:center">#</div>';
+  html += '<div data-i18n="sch.table.school">Школа</div>';
+  html += '<div data-i18n="sch.table.status">Статус</div>';
+  html += '<div data-i18n="sch.table.progress">Прогресс</div>';
+  html += '<div></div>';
+  html += '</div>';
+  
+  schools.forEach(function(s, idx){
+    const rank = idx + 1;
+    const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
+    const topClass = rank <= 3 ? ' top-' + rank : '';
+    const status = STATUS_LABELS[s.status];
+    
+    html += '<div class="rating-row' + topClass + '">';
+    html += '  <div class="rating-rank">' + rankIcon + '</div>';
+    html += '  <div class="rating-school">';
+    html += '    <div class="rating-school-name">' + s.name + '</div>';
+    html += '    <div class="rating-school-city">📍 ' + s.city + '</div>';
+    html += '  </div>';
+    html += '  <div class="rating-status ' + s.status + '">' + status.icon + ' ' + status.text + '</div>';
+    html += '  <div class="rating-progress">';
+    html += '    <div class="rating-progress-bar"><div class="rating-progress-fill" style="width:' + s.progress + '%"></div></div>';
+    html += '    <div class="rating-progress-num">' + s.progress + '%</div>';
+    html += '  </div>';
+    html += '  <div></div>';
+    html += '</div>';
+  });
+  
+  container.innerHTML = html;
+  
+  container.querySelectorAll('[data-i18n]').forEach(function(el){
+    const key = el.dataset.i18n;
+    if(i18n[currentLang] && i18n[currentLang][key]) el.textContent = i18n[currentLang][key];
+  });
+}
+
+document.querySelectorAll('.filter-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    document.querySelectorAll('.filter-btn').forEach(function(b){ b.classList.remove('active'); });
+    btn.classList.add('active');
+    renderSchoolsRating(btn.dataset.region);
+  });
+});
+
+if(document.getElementById('schoolsRating')){
+  renderSchoolsRating('all');
+}
+
+/* =========================================================
+   ПРОВЕРКА ВСЕХ ПЕРЕВОДОВ (для отладки)
+   ========================================================= */
+function checkTranslations(){
+  const missing = { ru:[], uz:[], en:[] };
+  const allKeys = new Set();
+  
+  // Собираем все ключи из HTML
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    allKeys.add(el.dataset.i18n);
+  });
+  document.querySelectorAll('[data-i18n-html]').forEach(function(el){
+    allKeys.add(el.dataset.i18nHtml);
+  });
+  
+  // Проверяем каждый ключ в каждом языке
+  ['ru','uz','en'].forEach(function(lang){
+    allKeys.forEach(function(key){
+      if(!i18n[lang][key]){
+        missing[lang].push(key);
+      }
+    });
+  });
+  
+  // Выводим результат в Console
+  console.log('%c=== ПРОВЕРКА ПЕРЕВОДОВ ===', 'font-size:16px;color:#2D6A4F;font-weight:bold');
+  console.log('Всего ключей в HTML: ' + allKeys.size);
+  
+  let hasErrors = false;
+  ['ru','uz','en'].forEach(function(lang){
+    if(missing[lang].length === 0){
+      console.log('%c✅ ' + lang.toUpperCase() + ' — все переводы есть', 'color:#40916C;font-weight:bold');
+    } else {
+      hasErrors = true;
+      console.log('%c❌ ' + lang.toUpperCase() + ' — не хватает ' + missing[lang].length + ' переводов:', 'color:#E63946;font-weight:bold');
+      missing[lang].forEach(function(k){
+        console.log('   %c- ' + k, 'color:#E63946');
+      });
+    }
+  });
+  
+  if(!hasErrors){
+    console.log('%c🎉 Все переводы на месте!', 'font-size:14px;color:#40916C;font-weight:bold');
+  }
+  
+  return missing;
+}
+
+// Запускаем проверку
+checkTranslations();
+calcFootprint();
+
+/* =========================================================
+   СООБЩИТЬ О ПРОБЛЕМЕ 📸
+   ========================================================= */
+const reportBtn = document.getElementById('reportBtn');
+const reportModal = document.getElementById('reportModal');
+const reportClose = document.getElementById('reportClose');
+const reportCancel = document.getElementById('reportCancel');
+const reportForm = document.getElementById('reportForm');
+const reportPhoto = document.getElementById('reportPhoto');
+const reportPhotoPreview = document.getElementById('reportPhotoPreview');
+const reportCoords = document.getElementById('reportCoords');
+
+let reportPicking = false;
+let reportLocation = null;
+let reportPhotoData = null;
+
+const userReportsLayer = L.layerGroup().addTo(map);
+
+function addUserReportMarker(r){
+  const icon = L.divIcon({
+    className: '',
+    html: '<div class="pin user-report"></div>',
+    iconSize: [26, 26],
+    iconAnchor: [13, 26],
+    popupAnchor: [0, -26]
+  });
+  let popup = '<h4>⚠️ ' + (r.typeLabel || 'Проблема') + '</h4>';
+  if(r.photo){
+    popup += '<img src="' + r.photo + '" style="width:100%;max-width:260px;border-radius:8px;margin:6px 0">';
+  }
+  if(r.desc){
+    popup += '<p>' + r.desc + '</p>';
+  }
+  if(r.name){
+    popup += '<p style="font-size:.8rem">👤 ' + r.name + '</p>';
+  }
+  popup += '<p style="font-size:.75rem;color:#999">' + new Date(r.date).toLocaleDateString() + '</p>';
+  L.marker([r.lat, r.lng], {icon: icon})
+    .bindPopup(popup, {maxWidth: 280})
+    .addTo(userReportsLayer);
+}
+
+function loadUserReports(){
+  const saved = JSON.parse(localStorage.getItem('ecogen-reports') || '[]');
+  saved.forEach(function(r){
+    addUserReportMarker(r);
+  });
+}
+
+function closeReportModal(){
+  reportModal.classList.remove('show');
+  reportForm.reset();
+  reportPhotoPreview.classList.remove('show');
+  reportPhotoPreview.innerHTML = '';
+  reportPhotoData = null;
+  reportLocation = null;
+}
+
+if(reportBtn){
+  reportBtn.addEventListener('click', function(){
+    reportPicking = !reportPicking;
+    reportBtn.classList.toggle('picking', reportPicking);
+    if(reportPicking){
+      reportBtn.textContent = '📍 Кликните на карту';
+      map.getContainer().style.cursor = 'crosshair';
+    } else {
+      reportBtn.textContent = '📸 Сообщить о проблеме';
+      map.getContainer().style.cursor = '';
+    }
+  });
+}
+
+map.on('click', function(e){
+  if(!reportPicking) return;
+  reportLocation = {lat: e.latlng.lat, lng: e.latlng.lng};
+  reportPicking = false;
+  reportBtn.classList.remove('picking');
+  reportBtn.textContent = '📸 Сообщить о проблеме';
+  map.getContainer().style.cursor = '';
+  reportCoords.textContent = '📍 ' + reportLocation.lat.toFixed(4) + ', ' + reportLocation.lng.toFixed(4);
+  reportModal.classList.add('show');
+});
+
+if(reportClose) reportClose.addEventListener('click', closeReportModal);
+if(reportCancel) reportCancel.addEventListener('click', closeReportModal);
+if(reportModal) reportModal.addEventListener('click', function(e){
+  if(e.target === reportModal) closeReportModal();
+});
+
+if(reportPhoto){
+  reportPhoto.addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      const img = new Image();
+      img.onload = function(){
+        const canvas = document.createElement('canvas');
+        const MAX = 600;
+        let w = img.width;
+        let h = img.height;
+        if(w > h && w > MAX){ h = h * MAX / w; w = MAX; }
+        else if(h > MAX){ w = w * MAX / h; h = MAX; }
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        reportPhotoData = canvas.toDataURL('image/jpeg', 0.75);
+        reportPhotoPreview.innerHTML = '<img src="' + reportPhotoData + '"><button type="button" id="removePhoto">×</button>';
+        reportPhotoPreview.classList.add('show');
+        document.getElementById('removePhoto').addEventListener('click', function(){
+          reportPhotoData = null;
+          reportPhoto.value = '';
+          reportPhotoPreview.classList.remove('show');
+          reportPhotoPreview.innerHTML = '';
+        });
+      };
+      img.src = ev.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+if(reportForm){
+  reportForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!reportLocation){
+      showToast('⚠️ Локация не выбрана');
+      return;
+    }
+    const typeSelect = document.getElementById('reportType');
+    const typeLabel = typeSelect.options[typeSelect.selectedIndex].textContent;
+    const report = {
+      lat: reportLocation.lat,
+      lng: reportLocation.lng,
+      type: typeSelect.value,
+      typeLabel: typeLabel,
+      desc: document.getElementById('reportDesc').value.trim(),
+      name: document.getElementById('reportName').value.trim(),
+      photo: reportPhotoData,
+      date: Date.now()
+    };
+    const all = JSON.parse(localStorage.getItem('ecogen-reports') || '[]');
+    all.push(report);
+    try {
+      localStorage.setItem('ecogen-reports', JSON.stringify(all));
+    } catch(err) {
+      showToast('⚠️ Слишком много заявок в памяти');
+      return;
+    }
+    addUserReportMarker(report);
+    map.flyTo([report.lat, report.lng], 15, {duration: 1.2});
+    showToast('✅ Заявка отправлена!');
+    closeReportModal();
+  });
+}
+
+loadUserReports();
+
+/* =========================================================
+   ДЫХАНИЕ ПЛАНЕТЫ 💨 — визуализация ветра
+   ========================================================= */
+const windCanvas = document.getElementById('windCanvas');
+const windToggle = document.getElementById('windToggle');
+const windCtx = windCanvas ? windCanvas.getContext('2d') : null;
+
+let windEnabled = false;
+let windParticles = [];
+let windGrid = null;
+let windAnimId = null;
+let windFrame = 0;
+
+function resizeWindCanvas(){
+  if(!windCanvas) return;
+  const rect = windCanvas.getBoundingClientRect();
+  windCanvas.width = rect.width;
+  windCanvas.height = rect.height;
+}
+
+async function loadWindGrid(){
+  if(!map) return;
+  const bounds = map.getBounds();
+  const rows = 6, cols = 6;
+  const lats = [], lons = [];
+  for(let r = 0; r < rows; r++){
+    for(let c = 0; c < cols; c++){
+      const lat = bounds.getSouth() + (bounds.getNorth() - bounds.getSouth()) * (r + 0.5) / rows;
+      const lon = bounds.getWest() + (bounds.getEast() - bounds.getWest()) * (c + 0.5) / cols;
+      lats.push(lat.toFixed(2));
+      lons.push(lon.toFixed(2));
+    }
+  }
+  const url = 'https://api.open-meteo.com/v1/forecast?latitude=' + lats.join(',') +
+              '&longitude=' + lons.join(',') +
+              '&current=wind_speed_10m,wind_direction_10m&wind_speed_unit=ms';
+  try {
+    const res = await fetch(url);
+    const data = await res.json();
+    const results = Array.isArray(data) ? data : [data];
+    
+    windGrid = { rows: rows, cols: cols, bounds: bounds, u: [], v: [] };
+    results.forEach(function(item){
+      const speed = (item.current && item.current.wind_speed_10m) || 0;
+      const dir = (item.current && item.current.wind_direction_10m) || 0;
+      const rad = dir * Math.PI / 180;
+      windGrid.u.push(-speed * Math.sin(rad));
+      windGrid.v.push(-speed * Math.cos(rad));
+    });
+  } catch(e) {
+    console.error('Wind error:', e);
+  }
+}
+
+function sampleWind(x, y){
+  if(!windGrid) return { u: 1, v: 0 };
+  const g = windGrid;
+  const fx = (x / windCanvas.width) * (g.cols - 1);
+  const fy = (y / windCanvas.height) * (g.rows - 1);
+  const x0 = Math.floor(fx), y0 = Math.floor(fy);
+  const x1 = Math.min(x0 + 1, g.cols - 1), y1 = Math.min(y0 + 1, g.rows - 1);
+  const tx = fx - x0, ty = fy - y0;
+  
+  const u = (1-tx)*(1-ty)*g.u[y0*g.cols+x0] + tx*(1-ty)*g.u[y0*g.cols+x1] +
+            (1-tx)*ty*g.u[y1*g.cols+x0] + tx*ty*g.u[y1*g.cols+x1];
+  const v = (1-tx)*(1-ty)*g.v[y0*g.cols+x0] + tx*(1-ty)*g.v[y0*g.cols+x1] +
+            (1-tx)*ty*g.v[y1*g.cols+x0] + tx*ty*g.v[y1*g.cols+x1];
+  return { u: u, v: v };
+}
+
+function initWindParticles(){
+  windParticles = [];
+  const count = 800;
+  for(let i = 0; i < count; i++){
+    windParticles.push({
+      x: Math.random() * windCanvas.width,
+      y: Math.random() * windCanvas.height,
+      age: Math.random() * 100,
+      maxAge: 80 + Math.random() * 120
+    });
+  }
+}
+
+function drawWind(){
+  if(!windEnabled || !windCtx) return;
+  
+  windCtx.globalCompositeOperation = 'destination-in';
+  windCtx.fillStyle = 'rgba(0,0,0,0.94)';
+  windCtx.fillRect(0, 0, windCanvas.width, windCanvas.height);
+  windCtx.globalCompositeOperation = 'source-over';
+  
+  windCtx.strokeStyle = 'rgba(79, 195, 247, 0.75)';
+  windCtx.lineWidth = 1.5;
+  windCtx.lineCap = 'round';
+  
+  const scale = 1.2;
+  
+  windParticles.forEach(function(p){
+    const wind = sampleWind(p.x, p.y);
+    const oldX = p.x, oldY = p.y;
+    
+    p.x += wind.u * scale;
+    p.y += -wind.v * scale;
+    p.age++;
+    
+    if(p.x < 0 || p.x > windCanvas.width || p.y < 0 || p.y > windCanvas.height || p.age > p.maxAge){
+      p.x = Math.random() * windCanvas.width;
+      p.y = Math.random() * windCanvas.height;
+      p.age = 0;
+      return;
+    }
+    
+    windCtx.beginPath();
+    windCtx.moveTo(oldX, oldY);
+    windCtx.lineTo(p.x, p.y);
+    windCtx.stroke();
+  });
+  
+  windFrame++;
+  
+  if(windFrame % 600 === 0){
+    loadWindGrid();
+  }
+  
+  windAnimId = requestAnimationFrame(drawWind);
+}
+
+if(windToggle && windCanvas){
+  window.addEventListener('resize', resizeWindCanvas);
+  resizeWindCanvas();
+  
+  windToggle.addEventListener('click', async function(){
+    windEnabled = !windEnabled;
+    windToggle.classList.toggle('active', windEnabled);
+    
+    if(windEnabled){
+      windToggle.textContent = '💨 Дыхание планеты (вкл)';
+      resizeWindCanvas();
+      await loadWindGrid();
+      initWindParticles();
+      windCanvas.classList.add('active');
+      drawWind();
+    } else {
+      windToggle.textContent = i18n[currentLang]['wind.btn'] || '💨 Дыхание планеты';
+      windCanvas.classList.remove('active');
+      if(windAnimId){
+        cancelAnimationFrame(windAnimId);
+        windAnimId = null;
+      }
+      windCtx.clearRect(0, 0, windCanvas.width, windCanvas.height);
+    }
+  });
+}
+
+
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', updateAQIPanel);
+} else {
+  updateAQIPanel();
+}
+</script>
+
+</body>
+</html>
